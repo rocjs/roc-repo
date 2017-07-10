@@ -1,0 +1,35 @@
+{
+  "name": "roc-plugin-repo-react",
+  "version": "0.0.0",
+  "description": "Roc plugin making it easy to manage React repositories",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "author": "Gustaf Dalemar",
+  "license": "MIT",
+  "keywords": [
+    "roc",
+    "roc-plugin",
+    "monorepo",
+    "react"
+  ],
+  "dependencies": {
+    "@storybook/react": "^3.0.1",
+    "babel-plugin-transform-class-properties": "6.23.0",
+    "babel-preset-react": "6.23.0",
+    "gh-pages": "^0.12.0",
+    "lodash": "^4.17.4",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "roc": "^1.0.0-rc.16",
+    "temp-write": "^3.3.0",
+    "webpack": "^3.1.0",
+    "webpack-merge": "^4.1.0"
+  },
+  "roc": {
+    "packages": [
+      "./lib"
+    ]
+  }
+}
