@@ -1,6 +1,6 @@
 {
   "name": "roc-plugin-repo-roc",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Roc plugin making it easy to manage Roc repositories",
   "main": "lib/index.js",
   "files": [
