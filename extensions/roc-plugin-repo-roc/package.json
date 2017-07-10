@@ -1,0 +1,24 @@
+{
+  "name": "roc-plugin-repo-roc",
+  "version": "0.0.0",
+  "description": "Roc plugin making it easy to manage Roc repositories",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "author": "Gustaf Dalemar",
+  "license": "MIT",
+  "keywords": [
+    "roc",
+    "roc-plugin",
+    "monorepo"
+  ],
+  "dependencies": {
+    "roc": "^1.0.0-rc.20"
+  },
+  "roc": {
+    "packages": [
+      "./lib"
+    ]
+  }
+}
