@@ -1,0 +1,60 @@
+{
+  "name": "roc-plugin-repo",
+  "version": "0.0.0",
+  "description": "Roc plugin making it easy to manage JavaScript repositories",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "eslint.js"
+  ],
+  "author": "Gustaf Dalemar",
+  "keywords": [
+    "roc",
+    "roc-plugin",
+    "monorepo"
+  ],
+  "dependencies": {
+    "add-stream": "1.0.0",
+    "babel-core": "^6.25.0",
+    "babel-jest": "^20.0.3",
+    "babel-preset-env": "1.2.1",
+    "babel-preset-stage-3": "^6.22.0",
+    "browser-resolve": "^1.11.2",
+    "chalk": "^1.1.3",
+    "chokidar": "^1.7.0",
+    "commitizen": "^2.8.6",
+    "conventional-changelog": "1.1.0",
+    "cz-conventional-changelog": "^1.2.0",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-config-prettier": "^2.3.0",
+    "eslint-config-roc": "^0.1.0",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-prettier": "^2.1.2",
+    "execa": "0.6.0",
+    "fs-readdir-recursive": "^1.0.0",
+    "glob": "^7.1.2",
+    "jest": "^20.0.4",
+    "jest-cli": "^20.0.4",
+    "listr": "^0.10.0",
+    "lodash": "^4.17.4",
+    "micromatch": "^3.0.3",
+    "output-file-sync": "^2.0.0",
+    "path-exists": "^3.0.0",
+    "prettier": "^1.5.2",
+    "read-pkg": "^2.0.0",
+    "resolve": "^1.3.3",
+    "rimraf": "^2.5.4",
+    "roc": "^1.0.0-rc.16",
+    "roc-package-module-dev": "^1.0.0-beta.3",
+    "roc-plugin-babel": "^1.0.0-beta.4",
+    "slash": "^1.0.0",
+    "tempfile": "1.1.1"
+  },
+  "roc": {
+    "packages": [
+      "./lib"
+    ]
+  }
+}
