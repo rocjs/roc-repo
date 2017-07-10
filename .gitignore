@@ -1,0 +1,5 @@
+.npmrc
+node_modules
+lib
+.DS_Store
+*.log

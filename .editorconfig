@@ -1,0 +1,27 @@
+# EditorConfig helps developers define and maintain consistent coding styles between different editors and IDEs.
+
+# Set this file as the topmost .editorconfig
+root = true
+
+[*]
+# Use hard or soft tabs ["tab", "space"]
+indent_style = space
+
+# Size of a single indent [an integer, "tab"]
+indent_size = tab
+
+# Line breaks representation ["lf", "cr", "crlf"]
+end_of_line = lf
+
+# ["latin1", "utf-8", "utf-16be", "utf-16le"]
+charset = utf-8
+
+[*.{js,json}]
+# Remove any whitespace characters preceding newline characters ["true", "false"]
+trim_trailing_whitespace = true
+
+# Ensure file ends with a newline when saving ["true", "false"]
+insert_final_newline = true
+
+# Number of columns representing a tab character [an integer]
+tab_width = 2
