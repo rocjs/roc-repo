@@ -1,3 +1,13 @@
+<a name="0.0.3"></a>
+## 0.0.3 (2017-07-11)
+
+
+### Bug Fixes
+
+* **roc-plugin-repo:** registry when publishing is now per project ([88aa0aa](https://github.com/rocjs/roc-plugin-repo/commit/88aa0aa))
+
+
+
 <a name="0.0.2"></a>
 ## 0.0.2 (2017-07-11)
 
