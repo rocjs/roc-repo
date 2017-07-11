@@ -193,6 +193,7 @@ module.exports.roc = {
           watch: {
             validator: validators.isBoolean,
             description: 'Enabled watch mode',
+            alias: 'w',
           },
         },
       },
