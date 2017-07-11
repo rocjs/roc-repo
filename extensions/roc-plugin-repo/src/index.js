@@ -205,6 +205,29 @@ module.exports.roc = {
           'Use commitizen when doing a commit, pass arguments with --',
         settings: true,
       },
+      exec: {
+        command: args => fetchProjects(lazyRequire('./commands/exec'))(args),
+        description:
+          'Run an arbitrary command in each project, will invoke what comes after --',
+        arguments: {
+          projects: {
+            validator: validators.isArray(validators.isString),
+            description: 'Projects to use',
+          },
+        },
+        options: {
+          silent: {
+            validator: validators.isBoolean,
+            description: 'Silent output',
+            default: true,
+          },
+          concurrent: {
+            validator: validators.isBoolean,
+            description: 'Run concurrently',
+            default: false,
+          },
+        },
+      },
       lint: {
         command: args => fetchProjects(lazyRequire('./commands/lint'))(args),
         description: 'Runs lint',
