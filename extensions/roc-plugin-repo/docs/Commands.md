@@ -23,6 +23,7 @@ All commands can be called with some additional options illustrated in the table
     * [build](#build)
     * [clean](#clean)
     * [commit](#commit)
+    * [exec](#exec)
     * [lint](#lint)
     * [list](#list)
     * [release](#release)
@@ -158,6 +159,29 @@ roc repo commit
 ####  Settings options
 _All groups are available._
 * [repo](docs/Settings.md#repo)
+
+####  Defined by extensions
+roc-plugin-repo
+
+### exec
+__Run an arbitrary command in each project, will invoke what comes after --__
+
+```
+roc repo exec [projects]
+```
+
+#### Arguments
+
+| Name         | Description      | Default | Type            | Required | Can be empty |
+| ------------ | ---------------- | ------- | --------------- | -------- | ------------ |
+| projects     | Projects to use  |         | `Array(String)` | No       | Yes          |
+
+#### Command options
+
+| Name         | Description      | Default | Type            | Required | Can be empty |
+| ------------ | ---------------- | ------- | --------------- | -------- | ------------ |
+| --concurrent | Run concurrently | `false` | `Boolean`       | No       |              |
+| --silent     | Silent output    | `true`  | `Boolean`       | No       |              |
 
 ####  Defined by extensions
 roc-plugin-repo
@@ -399,7 +423,7 @@ _All groups are available._
 roc-plugin-repo
 
 ### unlink
-__Unlinks up the projects__
+__Unlinks the projects__
 
 ```
 roc repo unlink [projects]
