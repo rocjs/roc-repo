@@ -5,6 +5,4 @@ cache:
 node_js:
   - 6.9
 before_script:
-  - npm start link
-after_success:
-  - npm start build
+  - npm start bootstrap

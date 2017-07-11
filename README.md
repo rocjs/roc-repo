@@ -15,3 +15,16 @@ Simplifies management of JavaScript repositories, supporting both monorepos and 
 ## Overview
 
 More to follow.
+
+## Contribute
+
+Use the local plugin on this repo by adding the following to the `package.json`.
+
+```json
+"roc": {
+  "plugins": [
+    "./extensions/roc-plugin-repo/lib",
+    "./extensions/roc-plugin-repo-roc/lib"
+  ]
+}
+```
