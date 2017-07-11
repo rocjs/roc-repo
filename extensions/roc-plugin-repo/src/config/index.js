@@ -1,4 +1,4 @@
-import { oneOf, isArray, isPath, isString } from 'roc/validators';
+import { oneOf, isArray, isPath, isString, isObject } from 'roc/validators';
 
 export const config = {
   settings: {
@@ -11,6 +11,7 @@ export const config = {
       output: 'lib',
       test: ['**/__tests__/**/*.js?(x)', '**/(*.)(spec|test).js?(x)'],
       npmBinary: 'npm',
+      babelPresetEnv: {},
     },
   },
 };
@@ -20,7 +21,7 @@ export const meta = {
     repo: {
       mono: {
         description:
-          'Directories that should be scanned for project or false to disable monorepo support.',
+          'Directories that should be scanned for projects or false to disable monorepo support.',
         validator: oneOf(isArray(isPath), (input, info) => {
           if (info) {
             return { type: 'false' };
@@ -48,6 +49,10 @@ export const meta = {
       npmBinary: {
         description: 'What npm binary to use, can be "yarn" for example.',
         validator: isString,
+      },
+      babelPresetEnv: {
+        description: 'Configuration to be used with babel-preset-env',
+        validator: isObject({ unmanaged: true }),
       },
     },
   },

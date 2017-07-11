@@ -2,9 +2,9 @@ import fs from 'fs';
 import * as validators from 'roc/validators';
 import log from 'roc/log/default/small';
 import readPkg from 'read-pkg';
-import { lazyFunctionRequire } from 'roc';
+import { lazyFunctionRequire, generateDependencies } from 'roc';
 
-import { invokeHook } from './util';
+import { invokeHook, packageJSON } from './util';
 import { config, meta } from './config';
 
 const lazyRequire = lazyFunctionRequire(require);
@@ -21,12 +21,12 @@ function getProjects(baseDirectory, directory) {
         fs.existsSync(`${baseDirectory}/${directory}/${project}/package.json`)
       ) {
         const path = `${baseDirectory}/${directory}/${project}`;
-        const packageJSON = readPkg.sync(`${path}/package.json`);
+        const pkgJSON = readPkg.sync(`${path}/package.json`);
         return {
           folder: project,
           path,
-          name: packageJSON.name,
-          packageJSON,
+          name: pkgJSON.name,
+          packageJSON: pkgJSON,
         };
       }
       return undefined;
@@ -55,6 +55,9 @@ Object.keys(jestOptions).forEach(key => {
 });
 
 module.exports.roc = {
+  dependencies: {
+    uses: generateDependencies(packageJSON, ['babel-preset-env']),
+  },
   plugins: [require.resolve('roc-plugin-babel')],
   hooks: {
     'get-projects': {
@@ -107,13 +110,13 @@ module.exports.roc = {
       }) => () => () => {
         if (settings.repo.mono === false) {
           if (fs.existsSync(`${directory}/package.json`)) {
-            const packageJSON = readPkg.sync(`${directory}/package.json`);
+            const pkgJSON = readPkg.sync(`${directory}/package.json`);
             return [
               {
                 folder: directory,
                 path: directory,
-                name: packageJSON.name,
-                packageJSON,
+                name: pkgJSON.name,
+                packageJSON: pkgJSON,
               },
             ];
           }
@@ -132,17 +135,22 @@ module.exports.roc = {
       hook: 'babel-config',
       description:
         'Adds babel-preset-latest with either modules enabled or not depending on the target',
-      action: () => target => babelConfig =>
+      action: ({
+        context: { config: { settings: { repo } } },
+      }) => target => babelConfig =>
         Object.assign({}, babelConfig, {
           presets:
             target === 'cjs'
               ? [
                   ...babelConfig.presets,
-                  require.resolve('babel-preset-env'),
+                  [require.resolve('babel-preset-env'), repo.babelPresetEnv],
                   require.resolve('babel-preset-stage-3'),
                 ]
               : [
-                  [require.resolve('babel-preset-env'), { modules: false }],
+                  [
+                    require.resolve('babel-preset-env'),
+                    { ...repo.babelPresetEnv, modules: false },
+                  ],
                   require.resolve('babel-preset-stage-3'),
                   ...babelConfig.presets,
                 ],
@@ -200,7 +208,7 @@ module.exports.roc = {
         },
       },
       commit: {
-        command: require('./commands/commit'),
+        command: lazyRequire('./commands/commit'),
         description:
           'Use commitizen when doing a commit, pass arguments with --',
         settings: true,
