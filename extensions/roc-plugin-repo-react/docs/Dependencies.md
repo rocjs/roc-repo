@@ -18,6 +18,11 @@ __Version__: ^15.6.1
 __Extension__: roc-plugin-repo-react  
 __Custom resolve function__:  No  
 
+### [react-test-renderer](https://www.npmjs.com/package/react-test-renderer)
+__Version__: ^15.6.1  
+__Extension__: roc-plugin-repo-react  
+__Custom resolve function__:  No  
+
 ## Requires
 Nothing is required.
 
