@@ -194,7 +194,8 @@ export default projects => ({
                           path.resolve(status[project].path, 'package.json'),
                         ),
                       ).version;
-                                status[project].version = newVersion; // eslint-disable-line
+                      // eslint-disable-next-line no-param-reassign
+                      status[project].version = newVersion;
                       return execute(
                         `git add . && git commit -m "release(${project}): ${newVersion}"`,
                         {
@@ -219,12 +220,10 @@ export default projects => ({
                   title: `${projectName}@${status[projectName].version}`,
                   task: () => {
                     let registry = '';
-                    if (
-                      context.packageJSON.publishConfig &&
-                      context.packageJSON.publishConfig.registry
-                    ) {
-                      registry = `--registry='${context.packageJSON
-                        .publishConfig.registry}'`;
+                    const publishConfig =
+                      status[projectName].packageJSON.publishConfig;
+                    if (publishConfig && publishConfig.registry) {
+                      registry = `--registry='${publishConfig.registry}'`;
                     }
 
                     const publishCommand = `npm publish ${registry} --tag ${tag}`;

@@ -12,6 +12,7 @@ export default function generateStatus(projects, isMonorepo) {
         commits: [],
         path: project.path,
         newVersion: undefined,
+        packageJSON: project.packageJSON,
       };
     });
 
