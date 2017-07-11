@@ -1,7 +1,7 @@
 import * as validators from 'roc/validators';
-import { lazyFunctionRequire } from 'roc';
+import { lazyFunctionRequire, generateDependencies } from 'roc';
 
-import { invokeHook } from './util';
+import { invokeHook, packageJSON } from './util';
 
 const lazyRequire = lazyFunctionRequire(require);
 
@@ -48,11 +48,12 @@ module.exports.roc = {
     },
   },
   dependencies: {
-    exports: {
-      '@storybook/react': '^3.0.1',
-      react: '^15.6.1',
-      'react-dom': '^15.6.1',
-    },
+    exports: generateDependencies(packageJSON, [
+      '@storybook/react',
+      'react-dom',
+      'react-test-renderer',
+      'react',
+    ]),
   },
   commands: {
     repo: {
