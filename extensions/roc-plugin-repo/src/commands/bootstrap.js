@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { execute } from 'roc';
+import { execute, executeSyncExit } from 'roc';
 import log from 'roc/log/default/small';
+import semver from 'semver';
 
 const linkExtra = (extra, binary) => {
   if (extra.length === 0) {
@@ -25,18 +26,18 @@ const removeDependencies = (dependencies = {}, localDependencies) => {
   return newDependencies;
 };
 
-const install = (project, extra, binary, localDependencies) => {
+const install = (project, extra, binary, localDependencies, useInstall) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
   const packageJSON = require(pathToPackageJSON); // eslint-disable-line
   const newPackageJSON = Object.assign({}, packageJSON);
 
   newPackageJSON.dependencies = removeDependencies(
     packageJSON.dependencies,
-    localDependencies,
+    Object.keys(localDependencies),
   );
   newPackageJSON.devDependencies = removeDependencies(
     packageJSON.devDependencies,
-    localDependencies,
+    Object.keys(localDependencies),
   );
 
   fs.writeFileSync(
@@ -56,22 +57,27 @@ const install = (project, extra, binary, localDependencies) => {
     `cd ${project.path}${linkExtra(
       extra,
       binary,
-    )} && ${binary} install && ${binary} link`,
+    )} && ${binary} install${useInstall ? '' : ` && ${binary} link`}`,
   ).then(restorePackageJSON, error => {
     restorePackageJSON();
     throw error;
   });
 };
 
-const link = (project, binary, localDependencies) => {
+const link = (project, binary, localDependencies, useInstall) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
 
   const packageJSON = require(pathToPackageJSON); // eslint-disable-line
   const toLink = Object.keys(
     Object.assign({}, packageJSON.dependencies, packageJSON.devDependencies),
   )
-    .filter(dependency => localDependencies.includes(dependency))
-    .map(previous => `${binary} link ${previous}`);
+    .filter(dependency => Object.keys(localDependencies).includes(dependency))
+    .map(
+      previous =>
+        useInstall
+          ? `${binary} install ${localDependencies[previous]}`
+          : `${binary} link ${previous}`,
+    );
 
   log.info(`Linking dependencies for ${project.name}`);
 
@@ -87,7 +93,7 @@ export default projects => ({
   options: { managed: { extra = [] } },
   context,
 }) => {
-  const settings = context.config.settings.repo;
+  const binary = context.config.settings.repo.npmBinary;
   const selected = projects.filter(
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
   );
@@ -96,13 +102,22 @@ export default projects => ({
     return log.small.warn('No projects were found');
   }
 
-  const localDependencies = projects.map(({ name }) => name);
+  const localDependencies = {};
+  projects.forEach(project => (localDependencies[project.name] = project.path));
+
+  // We want to use "npm install" over "npm link" when running with npm 5+
+  // This since the behaviour seems to have changed when using "link" and
+  // in general direct install seems to be the recommended way for monorepos
+  // We only want to do this when using npm, not when using yarn
+  const useInstall =
+    semver.satisfies(executeSyncExit('npm -v', { silent: true }), '>=5') &&
+    (binary === 'npm' || binary === 'npmc');
 
   return selected
     .reduce(
       (previous, project) =>
         previous.then(() =>
-          install(project, extra, settings.npmBinary, localDependencies),
+          install(project, extra, binary, localDependencies, useInstall),
         ),
       Promise.resolve(),
     )
@@ -110,7 +125,7 @@ export default projects => ({
       selected.reduce(
         (previous, project) =>
           previous.then(() =>
-            link(project, settings.npmBinary, localDependencies),
+            link(project, binary, localDependencies, useInstall),
           ),
         Promise.resolve(),
       ),
