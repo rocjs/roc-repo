@@ -8,7 +8,7 @@ const rocResolver = require('roc').getResolveRequest('Jest');
 const resolve = require('resolve');
 const browserResolve = require('browser-resolve');
 
-export default function customJestResolver(path, options) {
+module.exports = function customJestResolver(path, options) {
   const defaultResolver = options.browser ? browserResolve : resolve;
   const resolver = (request, context) =>
     defaultResolver.sync(request, { basedir: context });
@@ -36,4 +36,4 @@ export default function customJestResolver(path, options) {
       paths: options.paths,
     },
   );
-}
+};
