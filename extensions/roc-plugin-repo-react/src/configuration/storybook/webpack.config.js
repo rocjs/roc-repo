@@ -60,6 +60,25 @@ module.exports = (baseConfig, env) => {
     );
   }
 
+  if (fileExists('.storybook/entry.js', process.env.PROJECT_ROOT)) {
+    log.info('Using project entry.');
+
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        HAS_PROJECT_ENTRY: true,
+        PROJECT_ENTRY: JSON.stringify(
+          path.join(process.env.PROJECT_ROOT, '.storybook/entry.js'),
+        ),
+      }),
+    );
+  } else {
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        HAS_PROJECT_ENTRY: false,
+      }),
+    );
+  }
+
   if (fileExists('.storybook/webpack.config.js', process.env.PROJECT_ROOT)) {
     log.info('Using project Webpack configuration.');
 
