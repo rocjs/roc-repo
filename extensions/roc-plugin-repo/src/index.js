@@ -364,7 +364,7 @@ module.exports.roc = {
       },
       unlink: {
         command: args => fetchProjects(lazyRequire('./commands/unlink'))(args),
-        description: 'Unlinks up the projects',
+        description: 'Unlinks the projects',
         settings: true,
         arguments: {
           projects: {

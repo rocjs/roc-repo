@@ -2,7 +2,11 @@ import { execute } from 'roc';
 import log from 'roc/log/default/small';
 import Listr from 'listr';
 
-const unlink = (project, binary) => execute(`${binary} unlink ${project.name}`);
+const unlink = (project, binary) =>
+  execute(`${binary} unlink`, {
+    silent: true,
+    cwd: project.path,
+  });
 
 export default projects => ({
   arguments: { managed: { projects: selectedProjects } },
