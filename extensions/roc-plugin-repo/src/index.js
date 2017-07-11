@@ -24,6 +24,7 @@ function getProjects(baseDirectory, directory) {
         const pkgJSON = readPkg.sync(`${path}/package.json`);
         return {
           folder: project,
+          directory,
           path,
           name: pkgJSON.name,
           packageJSON: pkgJSON,
@@ -286,6 +287,11 @@ module.exports.roc = {
             default: true,
             description: 'If the project should be cleaned',
           },
+          'dist-tag': {
+            validator: validators.isString,
+            default: 'latest',
+            description: 'dist-tag to be used when publishing to npm',
+          },
           git: {
             validator: validators.isBoolean,
             default: true,
@@ -302,9 +308,24 @@ module.exports.roc = {
             description: 'If projects should be published',
           },
           tag: {
-            validator: validators.isString,
-            default: 'latest',
-            description: 'dist-tag to be used when publishing',
+            default: true,
+            validator: validators.isBoolean,
+            description: 'If git tags should be created',
+          },
+          github: {
+            default: true,
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isString,
+            ),
+            description:
+              'If a GitHub release should be made, will read from GITHUB_AUTH if true or use the value provided to the option',
+          },
+          draft: {
+            default: true,
+            validator: validators.isBoolean,
+            description:
+              'If the GitHub release should be done as a draft or not',
           },
         },
       },

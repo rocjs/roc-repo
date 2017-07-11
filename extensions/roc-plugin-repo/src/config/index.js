@@ -1,4 +1,12 @@
-import { oneOf, isArray, isPath, isString, isObject } from 'roc/validators';
+import {
+  oneOf,
+  isArray,
+  isPath,
+  isString,
+  isObject,
+  createInfoObject,
+} from 'roc/validators';
+import { toBoolean } from 'roc/converters';
 
 export const config = {
   settings: {
@@ -12,6 +20,9 @@ export const config = {
       test: ['**/__tests__/**/*.js?(x)', '**/(*.)(spec|test).js?(x)'],
       npmBinary: 'npm',
       babelPresetEnv: {},
+      release: {
+        collectedRelease: '[name:2:a].[hash:6].[date:yyyy-mm-dd]',
+      },
     },
   },
 };
@@ -53,6 +64,21 @@ export const meta = {
       babelPresetEnv: {
         description: 'Configuration to be used with babel-preset-env',
         validator: isObject({ unmanaged: true }),
+      },
+      release: {
+        collectedRelease: {
+          description: `Should be a template string if collected releases should be performed for monorepos or false if not.`,
+          validator: oneOf((input, info) => {
+            if (info) {
+              return createInfoObject({
+                validator: 'false',
+                converter: () => toBoolean,
+              });
+            }
+
+            return input === false;
+          }, isString),
+        },
       },
     },
   },
