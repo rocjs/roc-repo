@@ -4,6 +4,9 @@ import { execute } from 'roc';
 import log from 'roc/log/default/small';
 import ghpages from 'gh-pages';
 
+const buildStorybook = require.resolve('@storybook/react/dist/server/build');
+const startStorybook = require.resolve('@storybook/react/dist/server/index');
+
 module.exports = projects => ({
   arguments: { managed: { projects: selectedProjects } },
   options: { managed: { port, publish } },
@@ -29,9 +32,8 @@ module.exports = projects => ({
         .map(({ name }) => name)
         .join(
           ',',
-        )} && build-storybook -c ${configDirectory} -o ${outputDirectory} `,
+        )} && node ${buildStorybook} -c ${configDirectory} -o ${outputDirectory} `,
       {
-        context: path.resolve(__dirname, '..', '..'),
         cwd: directory,
       },
     ).then(() =>
@@ -53,14 +55,12 @@ module.exports = projects => ({
     cwd: directory,
   }).then(() =>
     Promise.all([
-      execute(`start-storybook -p ${port} -c ${configDirectory}`, {
-        context: path.resolve(__dirname, '..', '..'),
+      execute(`node ${startStorybook} -p ${port} -c ${configDirectory}`, {
         cwd: directory,
       }),
       execute(
         `roc build ${selected.map(({ name }) => name).join(',')} --watch`,
         {
-          context: path.resolve(__dirname, '..', '..'),
           cwd: directory,
           silent: true,
         },
