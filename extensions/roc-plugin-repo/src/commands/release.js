@@ -136,7 +136,7 @@ export default projects => ({
       {
         title: 'Testing',
         task: () =>
-          execute(`roc lint ${toRelease}`, {
+          execute(`roc test ${toRelease}`, {
             silent: true,
             context: context.directory,
           }),
