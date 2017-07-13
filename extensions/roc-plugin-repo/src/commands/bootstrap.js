@@ -75,7 +75,7 @@ const link = (project, binary, localDependencies, useInstall) => {
     .map(
       previous =>
         useInstall
-          ? `${binary} install ${localDependencies[previous]}`
+          ? `${binary} install ${localDependencies[previous]} --no-save`
           : `${binary} link ${previous}`,
     );
 
