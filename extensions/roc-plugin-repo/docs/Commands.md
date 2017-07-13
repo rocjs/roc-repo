@@ -112,15 +112,15 @@ roc repo build [projects]
 
 #### Arguments
 
-| Name     | Description        | Default | Type            | Required | Can be empty |
-| -------- | ------------------ | ------- | --------------- | -------- | ------------ |
-| projects | Projects to use    |         | `Array(String)` | No       | Yes          |
+| Name        | Description        | Default | Type            | Required | Can be empty |
+| ----------- | ------------------ | ------- | --------------- | -------- | ------------ |
+| projects    | Projects to use    |         | `Array(String)` | No       | Yes          |
 
 #### Command options
 
-| Name     | Description        | Default | Type            | Required | Can be empty |
-| -------- | ------------------ | ------- | --------------- | -------- | ------------ |
-| --watch  | Enabled watch mode |         | `Boolean`       | No       |              |
+| Name        | Description        | Default | Type            | Required | Can be empty |
+| ----------- | ------------------ | ------- | --------------- | -------- | ------------ |
+| -w, --watch | Enabled watch mode |         | `Boolean`       | No       |              |
 
 ####  Settings options
 _All groups are available._

@@ -1,3 +1,15 @@
+<a name="0.0.4"></a>
+## 0.0.4 (2017-07-13)
+
+
+### Bug Fixes
+
+* **roc-plugin-repo:** Alias for starting build in watch mode, --w ([98ab034](https://github.com/rocjs/roc-plugin-repo/commit/98ab034))
+* **roc-plugin-repo:** Correct bootstrap to work correctly with npm 5 ([d055f53](https://github.com/rocjs/roc-plugin-repo/commit/d055f53))
+* **roc-plugin-repo:** Correct release command to correctly run tests ([1b39348](https://github.com/rocjs/roc-plugin-repo/commit/1b39348))
+
+
+
 <a name="0.0.3"></a>
 ## 0.0.3 (2017-07-11)
 
