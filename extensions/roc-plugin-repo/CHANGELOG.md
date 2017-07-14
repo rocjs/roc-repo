@@ -1,3 +1,14 @@
+<a name="0.0.5"></a>
+## 0.0.5 (2017-07-14)
+
+
+### Bug Fixes
+
+* **roc-plugin-repo:** Build projects before running the tests ([0c81055](https://github.com/rocjs/roc-plugin-repo/commit/0c81055))
+* **roc-plugin-repo:** Ignore __snapshots__ when building projects ([c441e11](https://github.com/rocjs/roc-plugin-repo/commit/c441e11))
+
+
+
 <a name="0.0.4"></a>
 ## 0.0.4 (2017-07-13)
 
