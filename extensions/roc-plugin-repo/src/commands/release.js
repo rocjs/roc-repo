@@ -134,14 +134,6 @@ export default projects => ({
           }),
       },
       {
-        title: 'Testing',
-        task: () =>
-          execute(`roc test ${toRelease}`, {
-            silent: true,
-            context: context.directory,
-          }),
-      },
-      {
         title: 'Building',
         task: () =>
           execute(`roc build ${toRelease}`, {
@@ -150,6 +142,14 @@ export default projects => ({
           }),
       },
       ...invokeHook('release-after-build', Object.keys(status), Listr),
+      {
+        title: 'Testing',
+        task: () =>
+          execute(`roc test ${toRelease}`, {
+            silent: true,
+            context: context.directory,
+          }),
+      },
       {
         title: 'Prepare for release',
         task: () =>
