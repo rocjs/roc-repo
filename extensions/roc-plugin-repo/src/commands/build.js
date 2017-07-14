@@ -36,7 +36,8 @@ export default projects => ({
                         settings.targets.length === 1
                           ? `${project.path}/${settings.output}`
                           : `${project.path}/${settings.output}/${mode}`,
-                      ignore: settings.test,
+                      // We want to ignore potential __snapshots__ directories
+                      ignore: settings.test.concat('**/__snapshots__/**'),
                       copyFiles: true,
                       sourceMaps: true,
                       babelrc: false,
