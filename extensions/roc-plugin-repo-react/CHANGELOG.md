@@ -1,3 +1,13 @@
+<a name="0.0.3"></a>
+## 0.0.3 (2017-07-26)
+
+
+### Bug Fixes
+
+* **roc-plugin-repo-react:** Add build option to storybook command (#2) ([fdf0434](https://github.com/rocjs/roc-plugin-repo/commit/fdf0434))
+
+
+
 <a name="0.0.2"></a>
 ## 0.0.2 (2017-07-11)
 

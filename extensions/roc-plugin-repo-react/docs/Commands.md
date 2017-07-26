@@ -82,6 +82,7 @@ roc repo storybook [projects]
 
 | Name      | Description                                          | Default | Type            | Required | Can be empty |
 | --------- | ---------------------------------------------------- | ------- | --------------- | -------- | ------------ |
+| --build   | If static files for the Storybook should be built    | `false` | `Boolean`       | No       |              |
 | --port    | The port to start React Storybook on                 | `9001`  | `Integer`       | No       |              |
 | --publish | If the Storybook should be published to GitHub pages | `false` | `Boolean`       | No       |              |
 
