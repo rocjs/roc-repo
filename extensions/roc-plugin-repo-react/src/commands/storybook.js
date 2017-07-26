@@ -9,7 +9,7 @@ const startStorybook = require.resolve('@storybook/react/dist/server/index');
 
 module.exports = projects => ({
   arguments: { managed: { projects: selectedProjects } },
-  options: { managed: { port, publish } },
+  options: { managed: { build, port, publish } },
   context: { directory },
 }) => {
   const configDirectory = path.resolve(__dirname, '../configuration/storybook');
@@ -24,10 +24,10 @@ module.exports = projects => ({
   process.env.PROJECT_ROOT = directory;
   process.env.SELECTED_PROJECTS = JSON.stringify(selected);
 
-  if (publish) {
+  if (build || publish) {
     const outputDirectory = '.out';
 
-    return execute(
+    const building = execute(
       `roc build ${selected
         .map(({ name }) => name)
         .join(
@@ -36,18 +36,23 @@ module.exports = projects => ({
       {
         cwd: directory,
       },
-    ).then(() =>
-      ghpages.publish(
-        outputDirectory,
-        {
-          message: `Released at ${Date().toString()}`,
-        },
-        () => {
-          log.log(); // Create a new line for padding purposes
-          log.success('Storybook published.');
-        },
-      ),
     );
+
+    if (publish) {
+      return building.then(() =>
+        ghpages.publish(
+          outputDirectory,
+          {
+            message: `Released at ${Date().toString()}`,
+          },
+          () => {
+            log.log(); // Create a new line for padding purposes
+            log.success('Storybook published.');
+          },
+        ),
+      );
+    }
+    return building;
   }
 
   return execute(`roc build ${selected.map(({ name }) => name).join(',')}`, {

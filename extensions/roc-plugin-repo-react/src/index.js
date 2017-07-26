@@ -68,6 +68,11 @@ module.exports.roc = {
           },
         },
         options: {
+          build: {
+            validator: validators.isBoolean,
+            description: 'If static files for the Storybook should be built',
+            default: false,
+          },
           publish: {
             validator: validators.isBoolean,
             description: 'If the Storybook should be published to GitHub pages',
