@@ -1,3 +1,13 @@
+<a name="0.0.6"></a>
+## 0.0.6 (2017-07-31)
+
+
+### Bug Fixes
+
+* **roc-plugin-repo:** Add missing dependency on babel-eslint ([5acbb0a](https://github.com/rocjs/roc-plugin-repo/commit/5acbb0a))
+
+
+
 <a name="0.0.5"></a>
 ## 0.0.5 (2017-07-14)
 
