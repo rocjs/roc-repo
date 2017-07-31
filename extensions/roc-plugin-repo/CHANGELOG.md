@@ -1,3 +1,13 @@
+<a name="0.0.7"></a>
+## 0.0.7 (2017-07-31)
+
+
+### Bug Fixes
+
+* **roc-plugin-repo:** Use default .eslintignore file ([6798f87](https://github.com/rocjs/roc-plugin-repo/commit/6798f87))
+
+
+
 <a name="0.0.6"></a>
 ## 0.0.6 (2017-07-31)
 
