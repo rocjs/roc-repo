@@ -30,7 +30,7 @@ export default function generateStatus(projects, isMonorepo) {
             return;
           }
 
-          const project = commit.scope;
+          const project = isMonorepo ? commit.scope : projects[0].name;
           let toPush = null;
           if (commit.type === 'fix' || commit.type === 'perf') {
             // TODO Documented
@@ -57,7 +57,7 @@ export default function generateStatus(projects, isMonorepo) {
           if (toPush) {
             status[project].commits.push(commit);
           }
-          if (commit.type === 'release') {
+          if (commit.type === 'release' && commit.scope === project) {
             status[project].increment = versions.NOTHING;
             status[project].commits = [];
           }
