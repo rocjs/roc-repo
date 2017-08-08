@@ -1,24 +1,45 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
-import { execute, executeSyncExit } from 'roc';
+import { execute } from 'roc';
 import log from 'roc/log/default/small';
 import semver from 'semver';
+import onExit from 'signal-exit';
+import readPkg from 'read-pkg';
+import writePkg from 'write-pkg';
+import Listr from 'listr';
+import { createLink, createBinaryLink } from './utils/install';
+import generateStatus from '../semver/generateStatus';
+import { incrementToString } from '../semver/utils';
 
-const linkExtra = (extra, binary) => {
-  if (extra.length === 0) {
-    return '';
-  }
-
-  return ` && ${extra
-    .map(dependency => `${binary} link ${dependency}`)
-    .join(' && ')}`;
-};
-
-const removeDependencies = (dependencies = {}, localDependencies) => {
+const removeDependencies = (
+  dependencies = {},
+  localDependencies,
+  ignoreSemVer,
+) => {
   const newDependencies = {};
 
+  const removeDependenciesThatShouldBeLinked = dependency => {
+    // If the dependency is a local dependency we should remove it, return false
+    if (Object.keys(localDependencies).includes(dependency)) {
+      if (ignoreSemVer) {
+        return false;
+      }
+
+      // We check if the version match the requested one, accepting any version for "latest"
+      return (
+        dependencies[dependency] !== 'latest' &&
+        !semver.satisfies(
+          localDependencies[dependency].version,
+          dependencies[dependency],
+        )
+      );
+    }
+
+    return true;
+  };
+
   Object.keys(dependencies)
-    .filter(dependency => !localDependencies.includes(dependency))
+    .filter(removeDependenciesThatShouldBeLinked)
     .forEach(dependency => {
       newDependencies[dependency] = dependencies[dependency];
     });
@@ -26,110 +47,161 @@ const removeDependencies = (dependencies = {}, localDependencies) => {
   return newDependencies;
 };
 
-const install = (project, extra, binary, localDependencies, useInstall) => {
+const install = async (
+  project,
+  binary,
+  localDependencies,
+  { ignoreSemVer },
+) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
-  const packageJSON = require(pathToPackageJSON); // eslint-disable-line
-  const newPackageJSON = Object.assign({}, packageJSON);
+  const pathToPackageJSONBackup = `${pathToPackageJSON}.backup`;
+  const packageJSON = readPkg.sync(pathToPackageJSON);
+  const tempPackageJSON = Object.assign({}, packageJSON);
 
-  newPackageJSON.dependencies = removeDependencies(
+  tempPackageJSON.dependencies = removeDependencies(
     packageJSON.dependencies,
-    Object.keys(localDependencies),
+    localDependencies,
+    ignoreSemVer,
   );
-  newPackageJSON.devDependencies = removeDependencies(
+  tempPackageJSON.devDependencies = removeDependencies(
     packageJSON.devDependencies,
-    Object.keys(localDependencies),
+    localDependencies,
+    ignoreSemVer,
   );
 
-  fs.writeFileSync(
-    pathToPackageJSON,
-    `${JSON.stringify(newPackageJSON, null, 2)}\n`,
-  );
+  await fs.rename(pathToPackageJSON, pathToPackageJSONBackup);
 
-  log.info(`Installing dependencies and linking ${project.name}`);
+  await writePkg(pathToPackageJSON, tempPackageJSON);
 
   const restorePackageJSON = () =>
-    fs.writeFileSync(
-      pathToPackageJSON,
-      `${JSON.stringify(packageJSON, null, 2)}\n`,
-    );
+    fs.renameSync(pathToPackageJSONBackup, pathToPackageJSON);
 
-  return execute(
-    `cd ${project.path}${linkExtra(
-      extra,
-      binary,
-    )} && ${binary} install${useInstall ? '' : ` && ${binary} link`}`,
-  ).then(restorePackageJSON, error => {
-    restorePackageJSON();
-    throw error;
-  });
+  const unregister = onExit(restorePackageJSON);
+
+  return execute(`cd ${project.path} && ${binary} install`, {
+    silent: true,
+  }).then(
+    () => {
+      restorePackageJSON();
+      unregister();
+    },
+    error => {
+      restorePackageJSON();
+      unregister();
+      throw error;
+    },
+  );
 };
 
-const link = (project, binary, localDependencies, useInstall) => {
+const link = async (project, binary, localDependencies, { concurrency }) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
 
-  const packageJSON = require(pathToPackageJSON); // eslint-disable-line
-  const toLink = Object.keys(
-    Object.assign({}, packageJSON.dependencies, packageJSON.devDependencies),
-  )
-    .filter(dependency => Object.keys(localDependencies).includes(dependency))
-    .map(
-      previous =>
-        useInstall
-          ? `${binary} install ${localDependencies[previous]} --no-save`
-          : `${binary} link ${previous}`,
-    );
-
-  log.info(`Linking dependencies for ${project.name}`);
+  const packageJSON = await readPkg(pathToPackageJSON);
+  const toLink = Object.keys({
+    ...packageJSON.dependencies,
+    ...packageJSON.devDependencies,
+  }).filter(dependency => Object.keys(localDependencies).includes(dependency));
 
   if (toLink.length === 0) {
     return Promise.resolve();
   }
 
-  return execute(`cd ${project.path} && ${toLink.join(' && ')}`);
+  return new Listr(
+    toLink.map(dependency => ({
+      title: dependency,
+      task: async () => {
+        await fs.ensureDir(
+          `${project.path}/node_modules/${dependency}`
+            .split(path.sep)
+            .slice(0, -1)
+            .join(path.sep),
+        );
+
+        await createLink(
+          localDependencies[dependency].path,
+          `${project.path}/node_modules/${dependency}`,
+          'junction',
+        );
+
+        if (localDependencies[dependency].packageJSON.bin) {
+          return createBinaryLink(
+            localDependencies[dependency].path,
+            `${project.path}/node_modules/`,
+            dependency,
+            localDependencies[dependency].packageJSON.bin,
+          );
+        }
+
+        return Promise.resolve();
+      },
+    })),
+    { concurrent: concurrency },
+  );
 };
 
-export default projects => ({
+export default projects => async ({
   arguments: { managed: { projects: selectedProjects } },
-  options: { managed: { extra = [] } },
   context,
 }) => {
+  const concurrency = 2;
   const binary = context.config.settings.repo.npmBinary;
   const selected = projects.filter(
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
   );
+  const ignoreSemVer = false;
 
   if (selected.length === 0) {
-    return log.small.warn('No projects were found');
+    return log.warn('No projects were found');
   }
 
-  const localDependencies = {};
-  projects.forEach(project => {
-    localDependencies[project.name] = project.path;
-  });
+  const status =
+    ignoreSemVer || context.config.settings.repo.mono === false
+      ? {}
+      : await generateStatus(projects, true);
 
-  // We want to use "npm install" over "npm link" when running with npm 5+
-  // This since the behaviour seems to have changed when using "link" and
-  // in general direct install seems to be the recommended way for monorepos
-  // We only want to do this when using npm, not when using yarn
-  const useInstall =
-    semver.satisfies(executeSyncExit('npm -v', { silent: true }), '>=5') &&
-    (binary === 'npm' || binary === 'npmc');
+  const getNextVersion = project =>
+    !status[project.name]
+      ? project.packageJSON.version
+      : semver.inc(
+          project.packageJSON.version,
+          incrementToString(status[project.name].increment),
+        );
 
-  return selected
-    .reduce(
-      (previous, project) =>
-        previous.then(() =>
-          install(project, extra, binary, localDependencies, useInstall),
+  const localDependencies = projects.reduce(
+    (dependencies, project) => ({
+      ...dependencies,
+      [project.name]: {
+        ...project,
+        version: getNextVersion(project),
+      },
+    }),
+    {},
+  );
+
+  return new Listr([
+    {
+      title: 'Installing dependencies',
+      task: () =>
+        new Listr(
+          selected.map(project => ({
+            title: project.name,
+            task: () =>
+              install(project, binary, localDependencies, { ignoreSemVer }),
+          })),
+          { concurrent: concurrency },
         ),
-      Promise.resolve(),
-    )
-    .then(() =>
-      selected.reduce(
-        (previous, project) =>
-          previous.then(() =>
-            link(project, binary, localDependencies, useInstall),
-          ),
-        Promise.resolve(),
-      ),
-    );
+    },
+    {
+      title: 'Linking local dependencies',
+      task: () =>
+        new Listr(
+          selected.map(project => ({
+            title: project.name,
+            task: () =>
+              link(project, binary, localDependencies, { concurrency }),
+          })),
+          { concurrent: concurrency },
+        ),
+    },
+  ]).run();
 };

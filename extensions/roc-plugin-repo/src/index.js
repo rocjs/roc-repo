@@ -172,12 +172,6 @@ module.exports.roc = {
             description: 'Projects to use',
           },
         },
-        options: {
-          extra: {
-            description: 'Modules that should be linked into the projects',
-            validator: validators.isArray(validators.isString),
-          },
-        },
       },
       build: {
         command: args => fetchProjects(lazyRequire('./commands/build'))(args),
