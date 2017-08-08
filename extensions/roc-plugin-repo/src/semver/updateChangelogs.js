@@ -34,9 +34,16 @@ const generateChangelogForProject = ({ project, from }, isMonorepo) =>
             path: path.join(project.path, 'package.json'),
           },
           transform(commit, cb) {
-            return isMonorepo && commit.scope === project.name
-              ? cb(null, commit)
-              : cb();
+            if (isMonorepo && commit.scope === project.name) {
+              // Remove the scope if we are using monorepos since it will
+              // be the same for the entire changelog
+              commit.scope = null; // eslint-disable-line no-param-reassign
+              return cb(null, commit);
+            } else if (!isMonorepo) {
+              return cb(null, commit);
+            }
+
+            return cb();
           },
         },
         {},
