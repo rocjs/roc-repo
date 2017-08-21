@@ -65,7 +65,7 @@ export default function generateStatus(projects, isMonorepo) {
         },
       },
       {},
-      { reverse: true },
+      { reverse: true, from: undefined }, // from = undefined here to get all possible things to release
     )
       .on('end', () => {
         Object.keys(status).forEach(project => {
