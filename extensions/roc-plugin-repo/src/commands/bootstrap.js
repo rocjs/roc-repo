@@ -103,7 +103,9 @@ export default projects => ({
   }
 
   const localDependencies = {};
-  projects.forEach(project => (localDependencies[project.name] = project.path));
+  projects.forEach(project => {
+    localDependencies[project.name] = project.path;
+  });
 
   // We want to use "npm install" over "npm link" when running with npm 5+
   // This since the behaviour seems to have changed when using "link" and
