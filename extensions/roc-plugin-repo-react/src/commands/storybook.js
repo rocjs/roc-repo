@@ -28,7 +28,7 @@ module.exports = projects => ({
     const outputDirectory = '.out';
 
     const building = execute(
-      `roc build ${selected
+      `roc repo build ${selected
         .map(({ name }) => name)
         .join(
           ',',
