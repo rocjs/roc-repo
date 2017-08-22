@@ -240,6 +240,16 @@ module.exports.roc = {
           },
         },
       },
+      graph: {
+        command: args => fetchProjects(lazyRequire('./commands/graph'))(args),
+        description: 'Shows how the projects are connected with each other',
+        arguments: {
+          projects: {
+            validator: validators.isArray(validators.isString),
+            description: 'Projects to use',
+          },
+        },
+      },
       lint: {
         command: args => fetchProjects(lazyRequire('./commands/lint'))(args),
         description: 'Runs lint',

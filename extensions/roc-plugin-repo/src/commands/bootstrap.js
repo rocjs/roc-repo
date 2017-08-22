@@ -2,14 +2,13 @@ import fs from 'fs-extra';
 import path from 'path';
 import { execute } from 'roc';
 import log from 'roc/log/default/small';
-import semver from 'semver';
 import onExit from 'signal-exit';
 import readPkg from 'read-pkg';
 import writePkg from 'write-pkg';
 import Listr from 'listr';
 import { createLink, createBinaryLink } from './utils/install';
 import generateStatus from '../semver/generateStatus';
-import { incrementToString } from '../semver/utils';
+import { getNextVersions, createVersionsDoesNotMatch } from '../semver/utils';
 
 const removeDependencies = (
   dependencies = {},
@@ -18,25 +17,11 @@ const removeDependencies = (
 ) => {
   const newDependencies = {};
 
-  const removeDependenciesThatShouldBeLinked = dependency => {
-    // If the dependency is a local dependency we should remove it, return false
-    if (Object.keys(localDependencies).includes(dependency)) {
-      if (ignoreSemVer) {
-        return false;
-      }
-
-      // We check if the version match the requested one, accepting any version for "latest"
-      return (
-        dependencies[dependency] !== 'latest' &&
-        !semver.satisfies(
-          localDependencies[dependency].version,
-          dependencies[dependency],
-        )
-      );
-    }
-
-    return true;
-  };
+  const removeDependenciesThatShouldBeLinked = createVersionsDoesNotMatch(
+    localDependencies,
+    dependencies,
+    ignoreSemVer,
+  );
 
   Object.keys(dependencies)
     .filter(removeDependenciesThatShouldBeLinked)
@@ -161,24 +146,7 @@ export default projects => async ({
       ? {}
       : await generateStatus(projects, true);
 
-  const getNextVersion = project =>
-    !status[project.name]
-      ? project.packageJSON.version
-      : semver.inc(
-          project.packageJSON.version,
-          incrementToString(status[project.name].increment),
-        );
-
-  const localDependencies = projects.reduce(
-    (dependencies, project) => ({
-      ...dependencies,
-      [project.name]: {
-        ...project,
-        version: getNextVersion(project),
-      },
-    }),
-    {},
-  );
+  const localDependencies = getNextVersions(status, projects);
 
   return new Listr([
     {

@@ -1,5 +1,6 @@
 import path from 'path';
 import conventionalChangelog from 'conventional-changelog';
+import semver from 'semver';
 
 export const versions = {
   NOTHING: 0,
@@ -69,4 +70,51 @@ export function conventionalChangelogOptions(preset, isMonorepo) {
       return cb();
     },
   });
+}
+
+export function getNextVersions(status, projects) {
+  const getNextVersion = project =>
+    !status[project.name]
+      ? project.packageJSON.version
+      : semver.inc(
+          project.packageJSON.version,
+          incrementToString(status[project.name].increment),
+        );
+
+  return projects.reduce(
+    (dependencies, project) => ({
+      ...dependencies,
+      [project.name]: {
+        ...project,
+        version: getNextVersion(project),
+      },
+    }),
+    {},
+  );
+}
+
+export function createVersionsDoesNotMatch(
+  projectsWithVersions,
+  dependencies,
+  ignoreSemVer,
+) {
+  return dependency => {
+    // If the dependency is a local dependency we should remove it, return false
+    if (Object.keys(projectsWithVersions).includes(dependency)) {
+      if (ignoreSemVer) {
+        return false;
+      }
+
+      // We check if the version match the requested one, accepting any version for "latest"
+      return (
+        dependencies[dependency] !== 'latest' &&
+        !semver.satisfies(
+          projectsWithVersions[dependency].version,
+          dependencies[dependency],
+        )
+      );
+    }
+
+    return true;
+  };
 }
