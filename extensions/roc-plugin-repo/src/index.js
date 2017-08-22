@@ -173,6 +173,14 @@ module.exports.roc = {
             description: 'Projects to use',
           },
         },
+        options: {
+          linkAll: {
+            validator: validators.isBoolean,
+            description:
+              'If all projects should be linked with each other, ignoring SemVer ranges',
+            default: false,
+          },
+        },
       },
       build: {
         command: args => fetchProjects(lazyRequire('./commands/build'))(args),

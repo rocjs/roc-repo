@@ -141,6 +141,7 @@ const link = async (project, binary, localDependencies, { concurrency }) => {
 
 export default projects => async ({
   arguments: { managed: { projects: selectedProjects } },
+  options: { managed: { linkAll } },
   context,
 }) => {
   const concurrency = 2;
@@ -148,7 +149,8 @@ export default projects => async ({
   const selected = projects.filter(
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
   );
-  const ignoreSemVer = false;
+  // If we want to link all project we will ignore the semvers
+  const ignoreSemVer = linkAll;
 
   if (selected.length === 0) {
     return log.warn('No projects were found');
