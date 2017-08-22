@@ -297,6 +297,12 @@ module.exports.roc = {
             default: true,
             description: 'If project commits should be created',
           },
+          from: {
+            validator: validators.isString,
+            description:
+              'Manually specify from which commit the status generation should be performed, by default all commits',
+            default: undefined,
+          },
           push: {
             validator: validators.isBoolean,
             default: true,
@@ -371,6 +377,14 @@ module.exports.roc = {
           projects: {
             validator: validators.isArray(validators.isString),
             description: 'Projects to use',
+          },
+        },
+        options: {
+          from: {
+            validator: validators.isString,
+            description:
+              'Manually specify from which commit the status generation should be performed, by default all commits',
+            default: undefined,
           },
         },
       },

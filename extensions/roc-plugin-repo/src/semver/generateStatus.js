@@ -2,7 +2,7 @@ import conventionalChangelog from 'conventional-changelog';
 
 import { isBreakingChange, versions } from './utils';
 
-export default function generateStatus(projects, isMonorepo) {
+export default function generateStatus(projects, isMonorepo, from) {
   return new Promise(resolve => {
     const status = {};
 
@@ -65,7 +65,7 @@ export default function generateStatus(projects, isMonorepo) {
         },
       },
       {},
-      { reverse: true, from: undefined }, // from = undefined here to get all possible things to release
+      { reverse: true, from },
     )
       .on('end', () => {
         Object.keys(status).forEach(project => {

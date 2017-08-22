@@ -28,6 +28,7 @@ const report = status => {
 
 export default projects => ({
   arguments: { managed: { projects: selectedProjects } },
+  options: { managed: { from } },
   context,
 }) => {
   const privateProjects = [];
@@ -54,7 +55,7 @@ export default projects => ({
     return log.small.warn('No projects were found');
   }
 
-  return generateStatus(selected, !!settings.mono).then(status =>
+  return generateStatus(selected, !!settings.mono, from).then(status =>
     report(status),
   );
 };

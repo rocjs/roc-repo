@@ -18,14 +18,15 @@ export default projects => ({
   arguments: { managed: { projects: selectedProjects } },
   options: {
     managed: {
-      publish,
-      tag,
-      git,
-      push,
-      clean,
-      github,
-      draft,
       'dist-tag': distTag,
+      clean,
+      draft,
+      from,
+      git,
+      github,
+      publish,
+      push,
+      tag,
     },
   },
   context,
@@ -205,7 +206,7 @@ export default projects => ({
             {
               title: 'Updating CHANGELOG.md',
               task: () =>
-                updateChangelogs(selectedToBeReleased, !!settings.mono),
+                updateChangelogs(selectedToBeReleased, !!settings.mono, from),
             },
             {
               title: 'Prepare GitHub release',

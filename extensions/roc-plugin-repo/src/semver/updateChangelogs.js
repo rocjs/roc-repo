@@ -10,8 +10,8 @@ import {
   conventionalChangelogOptions,
 } from './utils';
 
-export default async function updateChangelogs(projects, isMonorepo) {
-  const latest = await getLatestCommitsSinceRelease('angular');
+export default async function updateChangelogs(projects, isMonorepo, from) {
+  const latest = await getLatestCommitsSinceRelease('angular', from);
   const generateChangelogForProject = createGenerateChangelogForProject(
     isMonorepo,
   );

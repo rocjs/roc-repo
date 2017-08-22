@@ -27,7 +27,7 @@ export function incrementToString(increment) {
   return '';
 }
 
-export function getLatestCommitsSinceRelease(preset) {
+export function getLatestCommitsSinceRelease(preset, from) {
   return new Promise(resolve => {
     const latest = {};
     conventionalChangelog(
@@ -42,7 +42,7 @@ export function getLatestCommitsSinceRelease(preset) {
         },
       },
       {},
-      { reverse: true },
+      { from, reverse: true },
     )
       .on('end', () => resolve(latest))
       .resume();
