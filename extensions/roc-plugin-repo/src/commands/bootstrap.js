@@ -36,7 +36,7 @@ const install = async (
   project,
   binary,
   localDependencies,
-  { ignoreSemVer },
+  { ignoreSemVer, verbose },
 ) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
   const pathToPackageJSONBackup = `${pathToPackageJSON}.backup`;
@@ -64,7 +64,7 @@ const install = async (
   const unregister = onExit(restorePackageJSON);
 
   return execute(`cd ${project.path} && ${binary} install`, {
-    silent: true,
+    silent: !verbose,
   }).then(
     () => {
       restorePackageJSON();
@@ -131,6 +131,7 @@ export default projects => async ({
 }) => {
   const concurrency = 2;
   const binary = context.config.settings.repo.npmBinary;
+  const verbose = context.verbose;
   const selected = projects.filter(
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
   );
@@ -156,7 +157,10 @@ export default projects => async ({
           selected.map(project => ({
             title: project.name,
             task: () =>
-              install(project, binary, localDependencies, { ignoreSemVer }),
+              install(project, binary, localDependencies, {
+                ignoreSemVer,
+                verbose,
+              }),
           })),
           { concurrent: concurrency },
         ),
