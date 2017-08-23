@@ -44,7 +44,7 @@ export default function generateStatus(projects, isMonorepo, from, prerelease) {
             );
             toPush = commit;
           }
-          if (commit.type === 'feat') {
+          if (commit.type === 'feat' || commit.type === 'revert') {
             status[project].increment = Math.max(
               status[project].increment,
               versions.MINOR,
