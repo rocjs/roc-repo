@@ -300,6 +300,12 @@ module.exports.roc = {
           },
         },
         options: {
+          automatic: {
+            validator: validators.isBoolean,
+            default: false,
+            description:
+              'If an automated release should be performed, useful for CI environments',
+          },
           prerelease: {
             validator: validators.oneOf(
               validators.isBoolean,
