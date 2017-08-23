@@ -284,7 +284,10 @@ module.exports.roc = {
 
             return log.log(
               `Found the following:\n${projects
-                .map(project => ` — ${project.name}`)
+                .map(
+                  project =>
+                    ` — ${project.name} (${project.packageJSON.version})`,
+                )
                 .join('\n')}`,
             );
           }),
