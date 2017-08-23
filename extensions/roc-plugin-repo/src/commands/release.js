@@ -39,6 +39,7 @@ export default projects => ({
   const collectedRelease = settings.release.collectedRelease;
   const individual = !collectedRelease;
   const token = github === true ? process.env.GITHUB_AUTH : github;
+  const hasRepositoryLink = !!context.packageJSON.repository;
   let selected = projects
     .filter(({ name }) => !selectedProjects || selectedProjects.includes(name))
     .filter(({ name, packageJSON }) => {
@@ -427,7 +428,8 @@ export default projects => ({
       },
       {
         title: 'Creating GitHub release',
-        skip: () => !token || !git || !tag || !github || !push,
+        skip: () =>
+          !token || !git || !tag || !github || !push || !hasRepositoryLink,
         task: async ctx => {
           if (individual && isMonorepo) {
             return Promise.all(
@@ -454,10 +456,15 @@ export default projects => ({
     ])
       .run()
       .then(ctx => {
-        if (!token) {
+        if (!token || !hasRepositoryLink) {
           log.log('');
           log.info(
-            'Could not publish a GitHub release since no token was defined. You can manually post it using the output below.\n',
+            'Could not publish a GitHub for the following reasons:\n' +
+              `${!token ? ' — no token was defined\n' : ''}` +
+              `${!hasRepositoryLink
+                ? ' — no repository field exists in the root package.json\n'
+                : ''}` +
+              '\nYou can manually create a release using the output below.\n',
           );
           log.log(ctx.releaseText);
         }
