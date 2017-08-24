@@ -1,12 +1,11 @@
-import path from 'path';
-
 import Listr from 'listr';
 import execa from 'execa';
 import { execute } from 'roc';
 import log from 'roc/log/default/small';
-import readPkg from 'read-pkg';
+import inquirer from 'inquirer';
+import { yellow } from 'chalk';
 
-import { incrementToString, versions } from '../semver/utils';
+import { getDefaultPrerelease } from '../semver/utils';
 import updateChangelogs from '../semver/updateChangelogs';
 import createGithubReleaseText from '../semver/createGithubReleaseText';
 import generateStatus from '../semver/generateStatus';
@@ -24,6 +23,7 @@ export default projects => ({
       from,
       git,
       github,
+      prerelease,
       publish,
       push,
       tag,
@@ -33,6 +33,7 @@ export default projects => ({
 }) => {
   const privateProjects = [];
   const settings = context.config.settings.repo;
+  const prereleaseTag = getDefaultPrerelease(prerelease);
   const isMonorepo = !!settings.mono;
   const collectedRelease = settings.release.collectedRelease;
   const individual = !collectedRelease;
@@ -59,7 +60,12 @@ export default projects => ({
     return log.warn('No projects were found');
   }
 
-  return generateStatus(selected, !!settings.mono).then(status => {
+  return generateStatus(
+    selected,
+    !!settings.mono,
+    from,
+    prereleaseTag,
+  ).then(async status => {
     if (Object.keys(status).length === 0) {
       return log.success('Nothing to release.');
     }
@@ -181,27 +187,14 @@ export default projects => ({
               title: 'Updating versions',
               task: () =>
                 Promise.all(
-                  Object.keys(status).map(project => {
-                    if (status[project].increment > versions.NOTHING) {
-                      return execute(
-                        `npm version ${incrementToString(
-                          status[project].increment,
-                        )} --no-git-tag-version`,
-                        { silent: true, cwd: status[project].path },
-                      );
-                    }
-
-                    return Promise.resolve();
-                  }),
-                ).then(() => {
-                  // Update the projects with the modified package.json, primarly the new version
-                  selectedToBeReleased.forEach(project => {
-                    // eslint-disable-next-line no-param-reassign
-                    project.packageJSON = readPkg.sync(
-                      path.join(project.path, 'package.json'),
-                    );
-                  });
-                }),
+                  Object.keys(status).map(project =>
+                    execute(
+                      `npm version ${status[project]
+                        .newVersion} --no-git-tag-version`,
+                      { silent: true, cwd: status[project].path },
+                    ),
+                  ),
+                ),
             },
             {
               title: 'Updating CHANGELOG.md',
@@ -249,8 +242,9 @@ export default projects => ({
                   (previous, project) =>
                     previous.then(() =>
                       execute(
-                        `git add . && git commit -m "release(${project.name}): ${project
-                          .packageJSON.version}"`,
+                        `git add . && git commit -m "release(${project.name}): ${status[
+                          project.name
+                        ].newVersion}"`,
                         {
                           silent: true,
                           cwd: project.path,
@@ -278,11 +272,10 @@ export default projects => ({
                   return Promise.all(
                     selectedToBeReleased.map(project => {
                       // eslint-disable-next-line no-param-reassign
-                      project.tag = `${project.name}@${project.packageJSON
-                        .version}`;
+                      project.tag = `${project.name}@${status[project.name]
+                        .newVersion}`;
                       return execute(
-                        `git tag ${project.name}@${project.packageJSON
-                          .version} ${project.releaseCommitHash}`,
+                        `git tag ${project.tag} ${project.releaseCommitHash}`,
                         { silent: true },
                       );
                     }),
@@ -297,14 +290,12 @@ export default projects => ({
                   });
                 }
 
-                selectedToBeReleased[0].tag = `v${selectedToBeReleased[0]
-                  .packageJSON.version}`;
-                return execute(
-                  `git tag v${selectedToBeReleased[0].packageJSON.version}`,
-                  {
-                    silent: true,
-                  },
-                );
+                selectedToBeReleased[0].tag = `v${status[
+                  selectedToBeReleased[0].name
+                ].newVersion}`;
+                return execute(`git tag ${selectedToBeReleased[0].tag}`, {
+                  silent: true,
+                });
               },
             },
           ]),
@@ -315,7 +306,7 @@ export default projects => ({
         task: () =>
           new Listr(
             selectedToBeReleased.map(project => ({
-              title: `${project.name}@${project.packageJSON.version}`,
+              title: `${project.name}@${status[project.name].newVersion}`,
               task: () => {
                 let registry = '';
                 const publishConfig = project.packageJSON.publishConfig;

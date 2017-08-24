@@ -1,8 +1,9 @@
 import conventionalChangelog from 'conventional-changelog';
+import semver from 'semver';
 
-import { isBreakingChange, versions } from './utils';
+import { isBreakingChange, versions, incrementToString } from './utils';
 
-export default function generateStatus(projects, isMonorepo, from) {
+export default function generateStatus(projects, isMonorepo, from, prerelease) {
   return new Promise(resolve => {
     const status = {};
 
@@ -13,6 +14,9 @@ export default function generateStatus(projects, isMonorepo, from) {
         path: project.path,
         newVersion: undefined,
         packageJSON: project.packageJSON,
+        currentVersion: project.packageJSON.version,
+        currentVersionPrerelease: undefined,
+        currentPrerelease: undefined,
       };
     });
 
@@ -59,7 +63,22 @@ export default function generateStatus(projects, isMonorepo, from) {
           }
           if (commit.type === 'release' && commit.scope === project) {
             status[project].increment = versions.NOTHING;
+            status[project].currentVersion = commit.subject;
             status[project].commits = [];
+
+            // If we hit a release we also want to reset the prerelease
+            status[project].currentVersionPrerelease = undefined;
+            status[project].currentPrerelease = undefined;
+          }
+          if (commit.type === 'prerelease' && commit.scope === project) {
+            status[project].currentVersionPrerelease = commit.subject;
+            status[project].currentPrerelease = semver.prerelease(
+              commit.subject,
+            )[0];
+
+            if (prerelease) {
+              status[project].commits = [];
+            }
           }
           cb();
         },
@@ -69,8 +88,36 @@ export default function generateStatus(projects, isMonorepo, from) {
     )
       .on('end', () => {
         Object.keys(status).forEach(project => {
-          if (status[project].increment === versions.NOTHING) {
+          if (status[project].commits.length === 0) {
             delete status[project];
+          } else if (prerelease && status[project].currentVersionPrerelease) {
+            // If we have a previous prerelease we want to find out if we have made a larger change
+            const difference = semver.diff(
+              status[project].currentVersion,
+              semver.inc(status[project].currentVersionPrerelease, 'patch'),
+            );
+            // If the range has changed we will need to make a new prerelease
+            if (incrementToString(status[project].increment) !== difference) {
+              status[project].newVersion = semver.inc(
+                status[project].currentVersion,
+                `pre${incrementToString(status[project].increment)}`,
+                prerelease,
+              );
+            } else {
+              status[project].newVersion = semver.inc(
+                status[project].currentVersionPrerelease,
+                'prerelease',
+                prerelease,
+              );
+            }
+          } else {
+            status[project].newVersion = semver.inc(
+              status[project].currentVersion,
+              prerelease
+                ? `pre${incrementToString(status[project].increment)}`
+                : incrementToString(status[project].increment),
+              prerelease,
+            );
           }
         });
         resolve(status);

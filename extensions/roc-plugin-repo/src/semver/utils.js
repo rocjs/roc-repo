@@ -118,3 +118,13 @@ export function createVersionsDoesNotMatch(
     return true;
   };
 }
+
+export function getDefaultPrerelease(prerelease) {
+  if (prerelease === true) {
+    return 'alpha';
+  } else if (prerelease === false) {
+    return undefined;
+  }
+
+  return prerelease;
+}

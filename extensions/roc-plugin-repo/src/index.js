@@ -300,6 +300,15 @@ module.exports.roc = {
           },
         },
         options: {
+          prerelease: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isString,
+            ),
+            default: false,
+            description:
+              'If a prerelease should be done, and what name that should be used for the tag, will default to "alpha"',
+          },
           clean: {
             validator: validators.isBoolean,
             default: true,
@@ -398,6 +407,15 @@ module.exports.roc = {
           },
         },
         options: {
+          prerelease: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isString,
+            ),
+            default: false,
+            description:
+              'If a prerelease should be done, and what name that should be used for the tag, will default to "alpha"',
+          },
           from: {
             validator: validators.isString,
             description:
