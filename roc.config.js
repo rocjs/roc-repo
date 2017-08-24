@@ -4,9 +4,12 @@ module.exports = {
       targets: ['cjs'],
       babelPresetEnv: {
         targets: {
-          node: 6
-        }
-      }
+          node: 6,
+        },
+      },
+      release: {
+        collectedRelease: false,
+      },
     },
   },
 };
