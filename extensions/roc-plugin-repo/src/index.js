@@ -24,6 +24,7 @@ function getProjects(baseDirectory, directory) {
         const pkgJSON = readPkg.sync(`${path}/package.json`);
         return {
           folder: project,
+          directory,
           path,
           name: pkgJSON.name,
           packageJSON: pkgJSON,
@@ -173,9 +174,11 @@ module.exports.roc = {
           },
         },
         options: {
-          extra: {
-            description: 'Modules that should be linked into the projects',
-            validator: validators.isArray(validators.isString),
+          linkAll: {
+            validator: validators.isBoolean,
+            description:
+              'If all projects should be linked with each other, ignoring SemVer ranges',
+            default: false,
           },
         },
       },
@@ -237,6 +240,16 @@ module.exports.roc = {
           },
         },
       },
+      graph: {
+        command: args => fetchProjects(lazyRequire('./commands/graph'))(args),
+        description: 'Shows how the projects are connected with each other',
+        arguments: {
+          projects: {
+            validator: validators.isArray(validators.isString),
+            description: 'Projects to use',
+          },
+        },
+      },
       lint: {
         command: args => fetchProjects(lazyRequire('./commands/lint'))(args),
         description: 'Runs lint',
@@ -271,7 +284,10 @@ module.exports.roc = {
 
             return log.log(
               `Found the following:\n${projects
-                .map(project => ` — ${project.name}`)
+                .map(
+                  project =>
+                    ` — ${project.name} (${project.packageJSON.version})`,
+                )
                 .join('\n')}`,
             );
           }),
@@ -287,15 +303,41 @@ module.exports.roc = {
           },
         },
         options: {
+          automatic: {
+            validator: validators.isBoolean,
+            default: false,
+            description:
+              'If an automated release should be performed, useful for CI environments',
+          },
+          prerelease: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isString,
+            ),
+            default: false,
+            description:
+              'If a prerelease should be done, and what name that should be used for the tag, will default to "alpha"',
+          },
           clean: {
             validator: validators.isBoolean,
             default: true,
             description: 'If the project should be cleaned',
           },
+          'dist-tag': {
+            validator: validators.isString,
+            default: 'latest',
+            description: 'dist-tag to be used when publishing to npm',
+          },
           git: {
             validator: validators.isBoolean,
             default: true,
             description: 'If project commits should be created',
+          },
+          from: {
+            validator: validators.isString,
+            description:
+              'Manually specify from which commit the status generation should be performed, by default all commits',
+            default: undefined,
           },
           push: {
             validator: validators.isBoolean,
@@ -308,9 +350,24 @@ module.exports.roc = {
             description: 'If projects should be published',
           },
           tag: {
-            validator: validators.isString,
-            default: 'latest',
-            description: 'dist-tag to be used when publishing',
+            default: true,
+            validator: validators.isBoolean,
+            description: 'If git tags should be created',
+          },
+          github: {
+            default: true,
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isString,
+            ),
+            description:
+              'If a GitHub release should be made, will read from GITHUB_AUTH if true or use the value provided to the option',
+          },
+          draft: {
+            default: true,
+            validator: validators.isBoolean,
+            description:
+              'If the GitHub release should be done as a draft or not',
           },
         },
       },
@@ -356,6 +413,23 @@ module.exports.roc = {
           projects: {
             validator: validators.isArray(validators.isString),
             description: 'Projects to use',
+          },
+        },
+        options: {
+          prerelease: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isString,
+            ),
+            default: false,
+            description:
+              'If a prerelease should be done, and what name that should be used for the tag, will default to "alpha"',
+          },
+          from: {
+            validator: validators.isString,
+            description:
+              'Manually specify from which commit the status generation should be performed, by default all commits',
+            default: undefined,
           },
         },
       },

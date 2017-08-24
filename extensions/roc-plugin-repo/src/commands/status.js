@@ -2,9 +2,13 @@ import log from 'roc/log/default';
 
 import generateStatus from '../semver/generateStatus';
 
-import { isBreakingChange, incrementToString } from '../semver/utils';
+import {
+  isBreakingChange,
+  incrementToString,
+  getDefaultPrerelease,
+} from '../semver/utils';
 
-const report = status => {
+const report = (status, isMonorepo, prerelease) => {
   const projects = Object.keys(status);
   if (projects.length === 0) {
     return log.small.success('Nothing to release');
@@ -14,7 +18,9 @@ const report = status => {
     const changes = status[project].commits
       .map(
         commit =>
-          `  — ${commit.header}${isBreakingChange(commit)
+          `  — ${isMonorepo
+            ? `${commit.type}: ${commit.subject}`
+            : commit.header}${isBreakingChange(commit)
             ? '\n    BREAKING CHANGE'
             : ''}`,
       )
@@ -22,16 +28,24 @@ const report = status => {
     log.large.raw(
       'log',
       incrementToString(status[project].increment).toUpperCase(),
-    )(changes, project);
+    )(
+      changes,
+      `${project} - ${status[project].currentVersion} -> ${status[project]
+        .newVersion}${!prerelease
+        ? ` (current: ${status[project].packageJSON.version})`
+        : ''}`,
+    );
   });
 };
 
 export default projects => ({
   arguments: { managed: { projects: selectedProjects } },
+  options: { managed: { from, prerelease } },
   context,
 }) => {
   const privateProjects = [];
   const settings = context.config.settings.repo;
+  const prereleaseTag = getDefaultPrerelease(prerelease);
   const selected = projects
     .filter(({ name }) => !selectedProjects || selectedProjects.includes(name))
     .filter(({ name, packageJSON }) => {
@@ -54,7 +68,10 @@ export default projects => ({
     return log.small.warn('No projects were found');
   }
 
-  return generateStatus(selected, !!settings.mono).then(status =>
-    report(status),
-  );
+  return generateStatus(
+    selected,
+    !!settings.mono,
+    from,
+    prereleaseTag,
+  ).then(status => report(status, !!settings.mono, prereleaseTag));
 };
