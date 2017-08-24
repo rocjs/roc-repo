@@ -24,6 +24,7 @@ All commands can be called with some additional options illustrated in the table
     * [clean](#clean)
     * [commit](#commit)
     * [exec](#exec)
+    * [graph](#graph)
     * [lint](#lint)
     * [list](#list)
     * [release](#release)
@@ -86,15 +87,15 @@ roc repo bootstrap [projects]
 
 #### Arguments
 
-| Name     | Description                                     | Default | Type            | Required | Can be empty |
-| -------- | ----------------------------------------------- | ------- | --------------- | -------- | ------------ |
-| projects | Projects to use                                 |         | `Array(String)` | No       | Yes          |
+| Name      | Description                                                              | Default | Type            | Required | Can be empty |
+| --------- | ------------------------------------------------------------------------ | ------- | --------------- | -------- | ------------ |
+| projects  | Projects to use                                                          |         | `Array(String)` | No       | Yes          |
 
 #### Command options
 
-| Name     | Description                                     | Default | Type            | Required | Can be empty |
-| -------- | ----------------------------------------------- | ------- | --------------- | -------- | ------------ |
-| --extra  | Modules that should be linked into the projects |         | `Array(String)` | No       | Yes          |
+| Name      | Description                                                              | Default | Type            | Required | Can be empty |
+| --------- | ------------------------------------------------------------------------ | ------- | --------------- | -------- | ------------ |
+| --linkAll | If all projects should be linked with each other, ignoring SemVer ranges | `false` | `Boolean`       | No       |              |
 
 ####  Settings options
 _All groups are available._
@@ -186,6 +187,22 @@ roc repo exec [projects]
 ####  Defined by extensions
 roc-plugin-repo
 
+### graph
+__Shows how the projects are connected with each other__
+
+```
+roc repo graph [projects]
+```
+
+#### Arguments
+
+| Name     | Description     | Default | Type            | Required | Can be empty |
+| -------- | --------------- | ------- | --------------- | -------- | ------------ |
+| projects | Projects to use |         | `Array(String)` | No       | Yes          |
+
+####  Defined by extensions
+roc-plugin-repo
+
 ### lint
 __Runs lint__
 
@@ -236,19 +253,25 @@ roc repo release [projects]
 
 #### Arguments
 
-| Name      | Description                               | Default    | Type            | Required | Can be empty |
-| --------- | ----------------------------------------- | ---------- | --------------- | -------- | ------------ |
-| projects  | Projects to use                           |            | `Array(String)` | No       | Yes          |
+| Name         | Description                                                                                                    | Default    | Type               | Required | Can be empty |
+| ------------ | -------------------------------------------------------------------------------------------------------------- | ---------- | ------------------ | -------- | ------------ |
+| projects     | Projects to use                                                                                                |            | `Array(String)`    | No       | Yes          |
 
 #### Command options
 
-| Name      | Description                               | Default    | Type            | Required | Can be empty |
-| --------- | ----------------------------------------- | ---------- | --------------- | -------- | ------------ |
-| --clean   | If the project should be cleaned          | `true`     | `Boolean`       | No       |              |
-| --git     | If project commits should be created      | `true`     | `Boolean`       | No       |              |
-| --publish | If projects should be published           | `true`     | `Boolean`       | No       |              |
-| --push    | If commits should be pushed to the remote | `true`     | `Boolean`       | No       |              |
-| --tag     | dist-tag to be used when publishing       | `"latest"` | `String`        | No       | Yes          |
+| Name         | Description                                                                                                    | Default    | Type               | Required | Can be empty |
+| ------------ | -------------------------------------------------------------------------------------------------------------- | ---------- | ------------------ | -------- | ------------ |
+| --automatic  | If an automated release should be performed, useful for CI environments                                        | `false`    | `Boolean`          | No       |              |
+| --clean      | If the project should be cleaned                                                                               | `true`     | `Boolean`          | No       |              |
+| --dist-tag   | dist-tag to be used when publishing to npm                                                                     | `"latest"` | `String`           | No       | Yes          |
+| --draft      | If the GitHub release should be done as a draft or not                                                         | `true`     | `Boolean`          | No       |              |
+| --from       | Manually specify from which commit the status generation should be performed, by default all commits           |            | `String`           | No       | Yes          |
+| --git        | If project commits should be created                                                                           | `true`     | `Boolean`          | No       |              |
+| --github     | If a GitHub release should be made, will read from GITHUB_AUTH if true or use the value provided to the option | `true`     | `Boolean / String` | No       |              |
+| --prerelease | If a prerelease should be done, and what name that should be used for the tag, will default to "alpha"         | `false`    | `Boolean / String` | No       |              |
+| --publish    | If projects should be published                                                                                | `true`     | `Boolean`          | No       |              |
+| --push       | If commits should be pushed to the remote                                                                      | `true`     | `Boolean`          | No       |              |
+| --tag        | If git tags should be created                                                                                  | `true`     | `Boolean`          | No       |              |
 
 ####  Settings options
 _All groups are available._
@@ -312,9 +335,16 @@ roc repo status [projects]
 
 #### Arguments
 
-| Name     | Description     | Default | Type            | Required | Can be empty |
-| -------- | --------------- | ------- | --------------- | -------- | ------------ |
-| projects | Projects to use |         | `Array(String)` | No       | Yes          |
+| Name         | Description                                                                                            | Default | Type               | Required | Can be empty |
+| ------------ | ------------------------------------------------------------------------------------------------------ | ------- | ------------------ | -------- | ------------ |
+| projects     | Projects to use                                                                                        |         | `Array(String)`    | No       | Yes          |
+
+#### Command options
+
+| Name         | Description                                                                                            | Default | Type               | Required | Can be empty |
+| ------------ | ------------------------------------------------------------------------------------------------------ | ------- | ------------------ | -------- | ------------ |
+| --from       | Manually specify from which commit the status generation should be performed, by default all commits   |         | `String`           | No       | Yes          |
+| --prerelease | If a prerelease should be done, and what name that should be used for the tag, will default to "alpha" | `false` | `Boolean / String` | No       |              |
 
 ####  Settings options
 _All groups are available._

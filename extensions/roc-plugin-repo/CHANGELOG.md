@@ -1,3 +1,26 @@
+<a name="0.0.8"></a>
+## 0.0.8 (2017-08-24)
+
+
+### Bug Fixes
+
+* Add check for repository field for GitHub releases ([f12dd68](https://github.com/rocjs/roc-plugin-repo/commit/f12dd68))
+* Add from flag to status and release for start hash ([25eb2bb](https://github.com/rocjs/roc-plugin-repo/commit/25eb2bb))
+* Add graph command, shows how projects are related ([151be26](https://github.com/rocjs/roc-plugin-repo/commit/151be26))
+* Add new interactive mode when doing a release ([75e1351](https://github.com/rocjs/roc-plugin-repo/commit/75e1351))
+* Add support for making prereleases of projects ([0fe421b](https://github.com/rocjs/roc-plugin-repo/commit/0fe421b))
+* Add support for the revert type for commits ([39feca1](https://github.com/rocjs/roc-plugin-repo/commit/39feca1))
+* Addressed issue generating status for non monorepo ([573f536](https://github.com/rocjs/roc-plugin-repo/commit/573f536))
+* Better changelog generation for both repo types ([a3b95ff](https://github.com/rocjs/roc-plugin-repo/commit/a3b95ff))
+* Display current version when listing projects ([c40ee81](https://github.com/rocjs/roc-plugin-repo/commit/c40ee81))
+* Enabled support for creating GitHub releases ([193a2fc](https://github.com/rocjs/roc-plugin-repo/commit/193a2fc))
+* Fix issue when generating status for some repos ([e635986](https://github.com/rocjs/roc-plugin-repo/commit/e635986))
+* Ignore __mocks__ when building projects ([f984884](https://github.com/rocjs/roc-plugin-repo/commit/f984884))
+* Improve bootstrap command, making it support npm[@5](https://github.com/5) ([00fa904](https://github.com/rocjs/roc-plugin-repo/commit/00fa904))
+* Made it possible to force linking all projects ([34556e5](https://github.com/rocjs/roc-plugin-repo/commit/34556e5))
+
+
+
 <a name="0.0.7"></a>
 ## 0.0.7 (2017-07-31)
 
