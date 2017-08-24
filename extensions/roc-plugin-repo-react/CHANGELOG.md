@@ -1,3 +1,13 @@
+<a name="0.0.4"></a>
+## 0.0.4 (2017-08-24)
+
+
+### Bug Fixes
+
+* Use repo build specifically for Storybook ([3748497](https://github.com/rocjs/roc-plugin-repo/commit/3748497))
+
+
+
 <a name="0.0.3"></a>
 ## 0.0.3 (2017-07-26)
 
