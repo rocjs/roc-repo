@@ -76,29 +76,24 @@ function angularTransformerOverride(transformer) {
     const newCommit = transformer(commit, context);
 
     if (newCommit) {
-      if (newCommit.type === 'Features') {
-        newCommit.type = ':sparkles: Features';
-      } else if (newCommit.type === 'Bug Fixes') {
-        newCommit.type = ':bug: Bug Fixes';
-      } else if (newCommit.type === 'Performance Improvements') {
-        newCommit.type = ':rocket: Performance Improvements';
-      } else if (newCommit.type === 'Reverts') {
-        newCommit.type = ':leftwards_arrow_with_hook: Reverts';
-      } else if (newCommit.type === 'Documentation') {
-        newCommit.type = ':books: Documentation';
-      } else if (newCommit.type === 'Styles') {
-        newCommit.type = ':nail_care: Styles';
-      } else if (newCommit.type === 'Code Refactoring') {
-        newCommit.type = ':recycle: Code Refactoring';
-      } else if (newCommit.type === 'Tests') {
-        newCommit.type = ':white_check_mark: Tests';
-      } else if (newCommit.type === 'Chores') {
-        newCommit.type = ':wrench: Chores';
-      }
+      const mapping = {
+        Features: ':sparkles: Features', // ✨
+        'Bug Fixes': ':bug: Bug Fixes', // 🐛
+        'Performance Improvements': ':rocket: Performance Improvements', // 🚀
+        Reverts: ':leftwards_arrow_with_hook: Reverts', // ↩️
+        Documentation: ':books: Documentation', // 📚
+        Styles: ':nail_care: Styles', // 💅
+        'Code Refactoring': ':recycle: Code Refactoring', // ♻️
+        Tests: ':white_check_mark: Tests', // ✅
+        Chores: ':wrench: Chores', // 🔧
+      };
+
+      newCommit.type = mapping[newCommit.type] || newCommit.type;
 
       newCommit.notes.forEach(note => {
         if (note.title === 'BREAKING CHANGES') {
-          note.title = ':boom: Breaking Changes'; // eslint-disable-line no-param-reassign
+          // eslint-disable-next-line no-param-reassign
+          note.title = ':boom: Breaking Changes'; // 💥
         }
       });
     }
