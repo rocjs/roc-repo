@@ -11,5 +11,5 @@
     "roc-plugin-repo-roc": "*",
     "roc": "^1.0.0-rc.20"
   },
-  "repository": "https://github.com/rocjs/roc"
+  "repository": "https://github.com/rocjs/roc-repo"
 }
