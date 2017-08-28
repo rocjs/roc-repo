@@ -1,3 +1,15 @@
+<a name="0.0.9"></a>
+## 0.0.9 (2017-08-28)
+
+
+### Bug Fixes
+
+* Improve concurrency flexibility ([bf676c4](https://github.com/rocjs/roc-plugin-repo/commit/bf676c4))
+* Use Listr for "run" and enable concurrency support ([2ca6971](https://github.com/rocjs/roc-plugin-repo/commit/2ca6971))
+* Use verbose renderer for Listr when running in CI ([27360c5](https://github.com/rocjs/roc-plugin-repo/commit/27360c5))
+
+
+
 <a name="0.0.8"></a>
 ## 0.0.8 (2017-08-24)
 

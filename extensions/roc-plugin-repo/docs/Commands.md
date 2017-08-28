@@ -87,15 +87,16 @@ roc repo bootstrap [projects]
 
 #### Arguments
 
-| Name      | Description                                                              | Default | Type            | Required | Can be empty |
-| --------- | ------------------------------------------------------------------------ | ------- | --------------- | -------- | ------------ |
-| projects  | Projects to use                                                          |         | `Array(String)` | No       | Yes          |
+| Name         | Description                                                              | Default | Type                | Required | Can be empty |
+| ------------ | ------------------------------------------------------------------------ | ------- | ------------------- | -------- | ------------ |
+| projects     | Projects to use                                                          |         | `Array(String)`     | No       | Yes          |
 
 #### Command options
 
-| Name      | Description                                                              | Default | Type            | Required | Can be empty |
-| --------- | ------------------------------------------------------------------------ | ------- | --------------- | -------- | ------------ |
-| --linkAll | If all projects should be linked with each other, ignoring SemVer ranges | `false` | `Boolean`       | No       |              |
+| Name         | Description                                                              | Default | Type                | Required | Can be empty |
+| ------------ | ------------------------------------------------------------------------ | ------- | ------------------- | -------- | ------------ |
+| --concurrent | Run concurrently                                                         | `2`     | `Boolean / Integer` | No       |              |
+| --linkAll    | If all projects should be linked with each other, ignoring SemVer ranges | `false` | `Boolean`           | No       |              |
 
 ####  Settings options
 _All groups are available._
@@ -173,16 +174,16 @@ roc repo exec [projects]
 
 #### Arguments
 
-| Name         | Description      | Default | Type            | Required | Can be empty |
-| ------------ | ---------------- | ------- | --------------- | -------- | ------------ |
-| projects     | Projects to use  |         | `Array(String)` | No       | Yes          |
+| Name         | Description      | Default | Type                | Required | Can be empty |
+| ------------ | ---------------- | ------- | ------------------- | -------- | ------------ |
+| projects     | Projects to use  |         | `Array(String)`     | No       | Yes          |
 
 #### Command options
 
-| Name         | Description      | Default | Type            | Required | Can be empty |
-| ------------ | ---------------- | ------- | --------------- | -------- | ------------ |
-| --concurrent | Run concurrently | `false` | `Boolean`       | No       |              |
-| --silent     | Silent output    | `true`  | `Boolean`       | No       |              |
+| Name         | Description      | Default | Type                | Required | Can be empty |
+| ------------ | ---------------- | ------- | ------------------- | -------- | ------------ |
+| --concurrent | Run concurrently | `false` | `Boolean / Integer` | No       |              |
+| --silent     | Silent output    | `true`  | `Boolean`           | No       |              |
 
 ####  Defined by extensions
 roc-plugin-repo
@@ -309,16 +310,17 @@ roc repo run [command] [projects]
 
 #### Arguments
 
-| Name     | Description             | Default | Type            | Required | Can be empty |
-| -------- | ----------------------- | ------- | --------------- | -------- | ------------ |
-| command  | The command to invoke   |         | `String`        | No       | Yes          |
-| projects | Projects to use         |         | `Array(String)` | No       | Yes          |
+| Name         | Description             | Default | Type                | Required | Can be empty |
+| ------------ | ----------------------- | ------- | ------------------- | -------- | ------------ |
+| command      | The command to invoke   |         | `String`            | No       | Yes          |
+| projects     | Projects to use         |         | `Array(String)`     | No       | Yes          |
 
 #### Command options
 
-| Name     | Description             | Default | Type            | Required | Can be empty |
-| -------- | ----------------------- | ------- | --------------- | -------- | ------------ |
-| --list   | Lists possible commands | `false` | `Boolean`       | No       |              |
+| Name         | Description             | Default | Type                | Required | Can be empty |
+| ------------ | ----------------------- | ------- | ------------------- | -------- | ------------ |
+| --concurrent | Run concurrently        | `false` | `Boolean / Integer` | No       |              |
+| --list       | Lists possible commands | `false` | `Boolean`           | No       |              |
 
 ####  Settings options
 * [mono](docs/Settings.md#mono)
