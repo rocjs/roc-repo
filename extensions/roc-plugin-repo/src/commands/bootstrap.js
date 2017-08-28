@@ -6,6 +6,7 @@ import onExit from 'signal-exit';
 import readPkg from 'read-pkg';
 import writePkg from 'write-pkg';
 import Listr from 'listr';
+import isCI from 'is-ci';
 import { createLink, createBinaryLink } from './utils/install';
 import generateStatus from '../semver/generateStatus';
 import { getNextVersions, createVersionsDoesNotMatch } from '../semver/utils';
@@ -149,33 +150,36 @@ export default projects => async ({
 
   const localDependencies = getNextVersions(status, projects);
 
-  return new Listr([
-    {
-      title: 'Installing dependencies',
-      task: () =>
-        new Listr(
-          selected.map(project => ({
-            title: project.name,
-            task: () =>
-              install(project, binary, localDependencies, {
-                ignoreSemVer,
-                verbose,
-              }),
-          })),
-          { concurrent: concurrency },
-        ),
-    },
-    {
-      title: 'Linking local dependencies',
-      task: () =>
-        new Listr(
-          selected.map(project => ({
-            title: project.name,
-            task: () =>
-              link(project, binary, localDependencies, { concurrency }),
-          })),
-          { concurrent: concurrency },
-        ),
-    },
-  ]).run();
+  return new Listr(
+    [
+      {
+        title: 'Installing dependencies',
+        task: () =>
+          new Listr(
+            selected.map(project => ({
+              title: project.name,
+              task: () =>
+                install(project, binary, localDependencies, {
+                  ignoreSemVer,
+                  verbose,
+                }),
+            })),
+            { concurrent: concurrency },
+          ),
+      },
+      {
+        title: 'Linking local dependencies',
+        task: () =>
+          new Listr(
+            selected.map(project => ({
+              title: project.name,
+              task: () =>
+                link(project, binary, localDependencies, { concurrency }),
+            })),
+            { concurrent: concurrency },
+          ),
+      },
+    ],
+    { renderer: isCI ? 'verbose' : 'default' },
+  ).run();
 };

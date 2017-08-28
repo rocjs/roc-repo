@@ -1,6 +1,7 @@
 import { execute } from 'roc';
 import log from 'roc/log/default/small';
 import Listr from 'listr';
+import isCI from 'is-ci';
 
 export default projects => ({
   arguments: { managed: { projects: selectedProjects } },
@@ -30,6 +31,6 @@ export default projects => ({
           cwd: project.path,
         }),
     })),
-    { concurrent },
+    { concurrent, renderer: isCI ? 'verbose' : 'default' },
   ).run();
 };

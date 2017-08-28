@@ -1,6 +1,7 @@
 import { execute } from 'roc';
 import log from 'roc/log/default/small';
 import Listr from 'listr';
+import isCI from 'is-ci';
 
 const rimraf = require.resolve('rimraf/bin');
 
@@ -23,6 +24,6 @@ export default projects => ({
       title: `Cleaning ${project.name}`,
       task: () => execute(clean(project, context.config.settings.repo.output)),
     })),
-    { concurrent: true },
+    { concurrent: true, renderer: isCI ? 'verbose' : 'default' },
   ).run();
 };

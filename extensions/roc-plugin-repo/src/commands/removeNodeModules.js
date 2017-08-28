@@ -3,6 +3,7 @@ import path from 'path';
 import { execute } from 'roc';
 import log from 'roc/log/default/small';
 import Listr from 'listr';
+import isCI from 'is-ci';
 
 const rimraf = require.resolve('rimraf/bin');
 
@@ -25,5 +26,6 @@ export default projects => ({
       title: `Removing node_modules for ${project.name}`,
       task: () => execute(remove(project)),
     })),
+    { renderer: isCI ? 'verbose' : 'default' },
   ).run();
 };
