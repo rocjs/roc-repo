@@ -180,6 +180,14 @@ module.exports.roc = {
               'If all projects should be linked with each other, ignoring SemVer ranges',
             default: false,
           },
+          concurrent: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isInteger,
+            ),
+            description: 'Run concurrently',
+            default: 2,
+          },
         },
       },
       build: {
@@ -234,7 +242,10 @@ module.exports.roc = {
             default: true,
           },
           concurrent: {
-            validator: validators.isBoolean,
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isInteger,
+            ),
             description: 'Run concurrently',
             default: false,
           },

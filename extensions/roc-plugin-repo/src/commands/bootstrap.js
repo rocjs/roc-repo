@@ -79,7 +79,7 @@ const install = async (
   );
 };
 
-const link = async (project, binary, localDependencies, { concurrency }) => {
+const link = async (project, binary, localDependencies, { concurrent }) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
 
   const packageJSON = await readPkg(pathToPackageJSON);
@@ -121,16 +121,15 @@ const link = async (project, binary, localDependencies, { concurrency }) => {
         return Promise.resolve();
       },
     })),
-    { concurrent: concurrency },
+    { concurrent },
   );
 };
 
 export default projects => async ({
   arguments: { managed: { projects: selectedProjects } },
-  options: { managed: { linkAll } },
+  options: { managed: { linkAll, concurrent } },
   context,
 }) => {
-  const concurrency = 2;
   const binary = context.config.settings.repo.npmBinary;
   const verbose = context.verbose;
   const selected = projects.filter(
@@ -164,7 +163,7 @@ export default projects => async ({
                   verbose,
                 }),
             })),
-            { concurrent: concurrency },
+            { concurrent },
           ),
       },
       {
@@ -174,9 +173,9 @@ export default projects => async ({
             selected.map(project => ({
               title: project.name,
               task: () =>
-                link(project, binary, localDependencies, { concurrency }),
+                link(project, binary, localDependencies, { concurrent }),
             })),
-            { concurrent: concurrency },
+            { concurrent },
           ),
       },
     ],
