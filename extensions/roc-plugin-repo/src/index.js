@@ -413,6 +413,14 @@ module.exports.roc = {
             default: false,
             validator: validators.isBoolean,
           },
+          concurrent: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isInteger,
+            ),
+            description: 'Run concurrently',
+            default: false,
+          },
         },
         settings: ['mono'],
       },
