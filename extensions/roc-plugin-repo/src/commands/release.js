@@ -444,6 +444,7 @@ export default projects => ({
                     project.tag,
                     token,
                     draft,
+                    !!prerelease,
                   ),
                 ),
               );
@@ -454,6 +455,7 @@ export default projects => ({
               ctx.releaseTag,
               token,
               draft,
+              !!prerelease,
             );
           },
         },
