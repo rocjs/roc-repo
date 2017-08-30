@@ -1,3 +1,13 @@
+<a name="0.0.13"></a>
+## 0.0.13 (2017-08-30)
+
+
+### Bug Fixes
+
+* Fix problem with running test when releasing ([8d20099](https://github.com/rocjs/roc-plugin-repo/commit/8d20099))
+
+
+
 <a name="0.0.12"></a>
 ## 0.0.12 (2017-08-30)
 
