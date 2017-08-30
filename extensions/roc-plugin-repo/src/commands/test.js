@@ -16,6 +16,9 @@ export default projects => ({
     return log.warn('No projects were found');
   }
 
+  // Enforce test
+  process.env.NODE_ENV = 'test';
+
   process.env.ROC_INITAL_ARGV = JSON.stringify(process.argv);
 
   let argv = [...extraArguments];
