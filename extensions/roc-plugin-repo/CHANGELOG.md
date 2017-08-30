@@ -1,3 +1,17 @@
+<a name="0.0.10"></a>
+## 0.0.10 (2017-08-30)
+
+
+### Bug Fixes
+
+* Do GitHub release as prerelease if in prerelease ([cc22d39](https://github.com/rocjs/roc-plugin-repo/commit/cc22d39))
+* Enforce NODE_ENV=test when running tests ([24deee0](https://github.com/rocjs/roc-plugin-repo/commit/24deee0))
+* Remove unused dependency ([661fd48](https://github.com/rocjs/roc-plugin-repo/commit/661fd48))
+* Support glob pattern in settings for mono ([72d9616](https://github.com/rocjs/roc-plugin-repo/commit/72d9616))
+* Use NODE_ENV=production when building for release ([046df54](https://github.com/rocjs/roc-plugin-repo/commit/046df54))
+
+
+
 <a name="0.0.9"></a>
 ## 0.0.9 (2017-08-28)
 
