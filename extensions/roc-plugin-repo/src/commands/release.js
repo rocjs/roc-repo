@@ -252,7 +252,7 @@ export default projects => ({
             }),
         },
         {
-          title: 'Building!!',
+          title: 'Building',
           task: () =>
             execa
               .shell(`roc repo build ${toRelease}`, {
@@ -274,10 +274,6 @@ export default projects => ({
           task: () =>
             execa.shell(`roc repo test ${toRelease}`, {
               cwd: context.directory,
-              env: {
-                NODE_ENV: 'production',
-                FORCE_COLOR: true,
-              },
             }),
         },
         {
