@@ -1,6 +1,5 @@
 import Listr from 'listr';
 import execa from 'execa';
-import { execute } from 'roc';
 import log from 'roc/log/default/small';
 import inquirer from 'inquirer';
 import { yellow } from 'chalk';
@@ -219,11 +218,17 @@ export default projects => ({
                   title: 'Removing node_modules',
                   skip: () =>
                     !isMonorepo ? 'Will only remove for monorepos' : false,
-                  task: () => execa.shell(`roc repo rnm ${toRelease}`),
+                  task: () =>
+                    execa.shell(`roc repo rnm ${toRelease}`, {
+                      cwd: context.directory,
+                    }),
                 },
                 {
                   title: 'Cleaning projects',
-                  task: () => execa.shell(`roc repo clean ${toRelease}`),
+                  task: () =>
+                    execa.shell(`roc repo clean ${toRelease}`, {
+                      cwd: context.directory,
+                    }),
                 },
               ],
               { concurrent: true },
@@ -232,34 +237,47 @@ export default projects => ({
         {
           title: 'Installing dependencies',
           task: () =>
-            execute(`roc repo bootstrap ${toRelease}`, {
-              silent: true,
-              context: context.directory,
+            execa.shell(`roc repo bootstrap ${toRelease}`, {
+              cwd: context.directory,
             }),
         },
         {
           title: 'Linting',
           task: () =>
-            execute(`roc repo lint ${toRelease}`, {
-              silent: true,
-              context: context.directory,
+            execa.shell(`roc repo lint ${toRelease}`, {
+              cwd: context.directory,
+              env: {
+                FORCE_COLOR: true,
+              },
             }),
         },
         {
-          title: 'Building',
+          title: 'Building!!',
           task: () =>
-            execute(`NODE_ENV=production roc repo build ${toRelease}`, {
-              silent: true,
-              context: context.directory,
-            }),
+            execa
+              .shell(`roc repo build ${toRelease}`, {
+                cwd: context.directory,
+                env: {
+                  NODE_ENV: 'production',
+                  FORCE_COLOR: true,
+                },
+              })
+              .catch(error => {
+                // We only want to see the Babel error here
+                error.message = error.stderr; // eslint-disable-line no-param-reassign
+                throw error;
+              }),
         },
         ...invokeHook('release-after-build', Object.keys(status), Listr),
         {
           title: 'Testing',
           task: () =>
-            execute(`roc repo test ${toRelease}`, {
-              silent: true,
-              context: context.directory,
+            execa.shell(`roc repo test ${toRelease}`, {
+              cwd: context.directory,
+              env: {
+                NODE_ENV: 'production',
+                FORCE_COLOR: true,
+              },
             }),
         },
         {
@@ -271,10 +289,10 @@ export default projects => ({
                 task: () =>
                   Promise.all(
                     Object.keys(status).map(project =>
-                      execute(
+                      execa.shell(
                         `npm version ${status[project]
                           .newVersion} --no-git-tag-version`,
-                        { silent: true, cwd: status[project].path },
+                        { cwd: status[project].path },
                       ),
                     ),
                   ),
@@ -324,24 +342,25 @@ export default projects => ({
                   selectedToBeReleased.reduce(
                     (previous, project) =>
                       previous.then(() =>
-                        execute(
-                          `git add . && git commit -m "release(${project.name}): ${status[
-                            project.name
-                          ].newVersion}"`,
-                          {
-                            silent: true,
-                            cwd: project.path,
-                          },
-                        ).then(async () => {
-                          const {
-                            stdout,
-                          } = await require('./utils/execute').default(
-                            'git rev-parse HEAD',
-                          );
-                          const hash = stdout.trim();
-                          // eslint-disable-next-line no-param-reassign
-                          project.releaseCommitHash = hash;
-                        }),
+                        execa
+                          .shell(
+                            `git add . && git commit -m "release(${project.name}): ${status[
+                              project.name
+                            ].newVersion}"`,
+                            {
+                              cwd: project.path,
+                            },
+                          )
+                          .then(async () => {
+                            const {
+                              stdout,
+                            } = await require('./utils/execute').default(
+                              'git rev-parse HEAD',
+                            );
+                            const hash = stdout.trim();
+                            // eslint-disable-next-line no-param-reassign
+                            project.releaseCommitHash = hash;
+                          }),
                       ),
                     Promise.resolve(),
                   ),
@@ -357,17 +376,19 @@ export default projects => ({
                         // eslint-disable-next-line no-param-reassign
                         project.tag = `${project.name}@${status[project.name]
                           .newVersion}`;
-                        return execute(
+                        return execa.shell(
                           `git tag ${project.tag} ${project.releaseCommitHash}`,
-                          { silent: true },
+                          {
+                            cwd: context.directory,
+                          },
                         );
                       }),
                     ).then(async () => {
                       if (collectedRelease) {
                         const releaseTag = await getTag(collectedRelease);
                         ctx.releaseTag = releaseTag;
-                        return execute(`git tag ${releaseTag}`, {
-                          silent: true,
+                        return execa.shell(`git tag ${releaseTag}`, {
+                          cwd: context.directory,
                         });
                       }
 
@@ -378,8 +399,8 @@ export default projects => ({
                   selectedToBeReleased[0].tag = `v${status[
                     selectedToBeReleased[0].name
                   ].newVersion}`;
-                  return execute(`git tag ${selectedToBeReleased[0].tag}`, {
-                    silent: true,
+                  return execa.shell(`git tag ${selectedToBeReleased[0].tag}`, {
+                    cwd: context.directory,
                   });
                 },
               },
@@ -401,7 +422,7 @@ export default projects => ({
 
                   const publishCommand = `npm publish ${registry} --tag ${distTag}`;
 
-                  return execute(publishCommand, {
+                  return execa.shell(publishCommand, {
                     cwd: project.path,
                   });
                 },
@@ -416,18 +437,16 @@ export default projects => ({
               {
                 title: 'Commits',
                 task: () =>
-                  execute('git push', {
-                    silent: true,
-                    context: context.directory,
+                  execa.shell('git push', {
+                    cwd: context.directory,
                   }),
               },
               {
                 title: 'Tags',
                 skip: () => !tag,
                 task: () =>
-                  execute('git push --tags', {
-                    silent: true,
-                    context: context.directory,
+                  execa.shell('git push --tags', {
+                    cwd: context.directory,
                   }),
               },
             ]),
