@@ -246,7 +246,7 @@ export default projects => ({
         {
           title: 'Building',
           task: () =>
-            execute(`roc repo build ${toRelease}`, {
+            execute(`NODE_ENV=production roc repo build ${toRelease}`, {
               silent: true,
               context: context.directory,
             }),
