@@ -1,3 +1,13 @@
+<a name="0.0.12"></a>
+## 0.0.12 (2017-08-30)
+
+
+### Bug Fixes
+
+* Use execa over execute in release for error info ([a791f24](https://github.com/rocjs/roc-plugin-repo/commit/a791f24))
+
+
+
 <a name="0.0.11"></a>
 ## 0.0.11 (2017-08-30)
 
