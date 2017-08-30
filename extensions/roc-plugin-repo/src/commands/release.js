@@ -217,6 +217,8 @@ export default projects => ({
               [
                 {
                   title: 'Removing node_modules',
+                  skip: () =>
+                    !isMonorepo ? 'Will only remove for monorepos' : false,
                   task: () => execa.shell(`roc repo rnm ${toRelease}`),
                 },
                 {
