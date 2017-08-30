@@ -10,6 +10,7 @@ export default function createGitHubRelease(
   tag,
   AUTH_TOKEN,
   draft = true,
+  prerelease = false,
 ) {
   const repoInfo = getPkgRepo(packageJSON);
   const browse = url.parse(repoInfo.browse());
@@ -39,5 +40,6 @@ export default function createGitHubRelease(
     name: tag,
     body: text,
     draft,
+    prerelease,
   });
 }

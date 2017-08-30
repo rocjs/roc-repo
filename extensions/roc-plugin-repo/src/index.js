@@ -3,6 +3,7 @@ import * as validators from 'roc/validators';
 import log from 'roc/log/default/small';
 import readPkg from 'read-pkg';
 import { lazyFunctionRequire, generateDependencies } from 'roc';
+import glob from 'glob';
 
 import { invokeHook, packageJSON } from './util';
 import { config, meta } from './config';
@@ -126,10 +127,17 @@ module.exports.roc = {
         }
 
         // Look for things in either of these directories
-        return settings.repo.mono.reduce(
-          (previous, dir) => previous.concat(getProjects(directory, dir)),
-          [],
-        );
+        return settings.repo.mono.reduce((previous, dir) => {
+          const explodedPaths = glob.sync(dir, {
+            cwd: directory,
+          });
+          return previous.concat(
+            explodedPaths.reduce(
+              (prev, d) => prev.concat(getProjects(directory, d)),
+              [],
+            ),
+          );
+        }, []);
       },
     },
     {
