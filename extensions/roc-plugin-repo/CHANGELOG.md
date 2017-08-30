@@ -1,3 +1,13 @@
+<a name="0.0.11"></a>
+## 0.0.11 (2017-08-30)
+
+
+### Bug Fixes
+
+* Only remove node_modules for monorepos ([c49f231](https://github.com/rocjs/roc-plugin-repo/commit/c49f231))
+
+
+
 <a name="0.0.10"></a>
 ## 0.0.10 (2017-08-30)
 
