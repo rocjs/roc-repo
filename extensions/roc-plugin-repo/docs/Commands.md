@@ -268,6 +268,8 @@ roc repo release [projects]
 | --draft      | If the GitHub release should be done as a draft or not                                                         | `true`     | `Boolean`          | No       |              |
 | --from       | Manually specify from which commit the status generation should be performed, by default all commits           |            | `String`           | No       | Yes          |
 | --git        | If project commits should be created                                                                           | `true`     | `Boolean`          | No       |              |
+| --git-email  | Email to use for Git author over the default                                                                   |            | `String`           | No       | Yes          |
+| --git-name   | Name to use for Git author over the default                                                                    |            | `String`           | No       | Yes          |
 | --github     | If a GitHub release should be made, will read from GITHUB_AUTH if true or use the value provided to the option | `true`     | `Boolean / String` | No       |              |
 | --prerelease | If a prerelease should be done, and what name that should be used for the tag, will default to "alpha"         | `false`    | `Boolean / String` | No       |              |
 | --publish    | If projects should be published                                                                                | `true`     | `Boolean`          | No       |              |

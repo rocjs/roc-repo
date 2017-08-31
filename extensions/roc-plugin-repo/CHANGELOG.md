@@ -1,3 +1,14 @@
+<a name="0.0.14"></a>
+## 0.0.14 (2017-08-31)
+
+
+### Bug Fixes
+
+* Only show GitHub release text if we have one ([5b38a8b](https://github.com/rocjs/roc-plugin-repo/commit/5b38a8b))
+* Possible to define Git author and disable hooks ([2139144](https://github.com/rocjs/roc-plugin-repo/commit/2139144))
+
+
+
 <a name="0.0.13"></a>
 ## 0.0.13 (2017-08-30)
 
