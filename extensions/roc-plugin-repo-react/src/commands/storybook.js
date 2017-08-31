@@ -1,17 +1,28 @@
 import path from 'path';
+import fs from 'fs';
 
 import { execute } from 'roc';
 import log from 'roc/log/default/small';
 import ghpages from 'gh-pages';
+import onExit from 'signal-exit';
 
 const buildStorybook = require.resolve('@storybook/react/dist/server/build');
 const startStorybook = require.resolve('@storybook/react/dist/server/index');
 
 module.exports = projects => ({
   arguments: { managed: { projects: selectedProjects } },
-  options: { managed: { build, port, publish } },
-  context: { directory },
+  options: {
+    managed: {
+      build,
+      port,
+      publish,
+      'git-name': gitName,
+      'git-email': gitEmail,
+    },
+  },
+  context,
 }) => {
+  const directory = context.directory;
   const configDirectory = path.resolve(__dirname, '../configuration/storybook');
   const selected = projects.filter(
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
@@ -39,18 +50,48 @@ module.exports = projects => ({
     );
 
     if (publish) {
-      return building.then(() =>
-        ghpages.publish(
+      let unregister;
+      const restoreGitHooksDirectory = () => {
+        fs.renameSync(
+          path.join(context.directory, '.git', 'hooks.backup'),
+          path.join(context.directory, '.git', 'hooks'),
+        );
+      };
+
+      const user = gitName
+        ? {
+            name: gitName,
+            email: gitEmail,
+          }
+        : null;
+
+      return building.then(() => {
+        // Move Git hooks if we don't want to run Git hooks
+        if (!context.config.settings.repo.runGitHooks) {
+          unregister = onExit(restoreGitHooksDirectory);
+
+          fs.renameSync(
+            path.join(context.directory, '.git', 'hooks'),
+            path.join(context.directory, '.git', 'hooks.backup'),
+          );
+        }
+
+        return ghpages.publish(
           outputDirectory,
           {
+            user,
             message: `Released at ${Date().toString()}`,
           },
           () => {
+            if (!context.config.settings.repo.runGitHooks) {
+              restoreGitHooksDirectory();
+              unregister();
+            }
             log.log(); // Create a new line for padding purposes
             log.success('Storybook published.');
           },
-        ),
-      );
+        );
+      });
     }
     return building;
   }

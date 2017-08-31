@@ -24,6 +24,7 @@
     "react-dom": "^15.6.1",
     "react-test-renderer": "^15.6.1",
     "roc": "^1.0.0-rc.16",
+    "signal-exit": "^3.0.2",
     "temp-write": "^3.3.0",
     "webpack": "^3.1.0",
     "webpack-merge": "^4.1.0"

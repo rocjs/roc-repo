@@ -83,6 +83,16 @@ module.exports.roc = {
             description: 'The port to start React Storybook on',
             default: 9001,
           },
+          'git-name': {
+            validator: validators.isString,
+            description:
+              'Name to use for Git author over the default when publishing',
+          },
+          'git-email': {
+            validator: validators.isString,
+            description:
+              'Email to use for Git author over the default when publishing',
+          },
         },
       },
     },
