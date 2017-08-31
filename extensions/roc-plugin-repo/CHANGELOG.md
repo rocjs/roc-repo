@@ -1,3 +1,14 @@
+<a name="0.0.15"></a>
+## 0.0.15 (2017-08-31)
+
+
+### Bug Fixes
+
+* Fix issue in bootstrap command related to linking ([f99dd35](https://github.com/rocjs/roc-plugin-repo/commit/f99dd35))
+* Show in list command if a project is private ([6cfe9ca](https://github.com/rocjs/roc-plugin-repo/commit/6cfe9ca))
+
+
+
 <a name="0.0.14"></a>
 ## 0.0.14 (2017-08-31)
 
