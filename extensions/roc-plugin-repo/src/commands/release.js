@@ -481,7 +481,7 @@ export default projects => ({
     )
       .run()
       .then(ctx => {
-        if (!token || !hasRepositoryLink) {
+        if (ctx.releaseText && (!token || !hasRepositoryLink)) {
           log.log('');
           log.info(
             'Could not publish a GitHub for the following reasons:\n' +
