@@ -1,10 +1,11 @@
 import {
-  oneOf,
+  createInfoObject,
   isArray,
+  isBoolean,
+  isObject,
   isPath,
   isString,
-  isObject,
-  createInfoObject,
+  oneOf,
 } from 'roc/validators';
 import { toBoolean } from 'roc/converters';
 
@@ -20,6 +21,7 @@ export const config = {
       test: ['**/__tests__/**/*.js?(x)', '**/(*.)(spec|test).js?(x)'],
       npmBinary: 'npm',
       babelPresetEnv: {},
+      runGitHooks: false,
       release: {
         collectedRelease: '[name:2:a].[hash:6].[date:yyyy-mm-dd]',
       },
@@ -64,6 +66,11 @@ export const meta = {
       babelPresetEnv: {
         description: 'Configuration to be used with babel-preset-env',
         validator: isObject({ unmanaged: true }),
+      },
+      runGitHooks: {
+        description:
+          'If Git hooks should be invoked on automatic commit and push creation',
+        validator: isBoolean,
       },
       release: {
         collectedRelease: {

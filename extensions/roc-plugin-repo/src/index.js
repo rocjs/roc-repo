@@ -352,6 +352,14 @@ module.exports.roc = {
             default: true,
             description: 'If project commits should be created',
           },
+          'git-name': {
+            validator: validators.isString,
+            description: 'Name to use for Git author over the default',
+          },
+          'git-email': {
+            validator: validators.isString,
+            description: 'Email to use for Git author over the default',
+          },
           from: {
             validator: validators.isString,
             description:

@@ -18,6 +18,8 @@ export default projects => ({
   options: {
     managed: {
       'dist-tag': distTag,
+      'git-name': gitName,
+      'git-email': gitEmail,
       automatic,
       clean,
       draft,
@@ -40,6 +42,8 @@ export default projects => ({
   const individual = !collectedRelease;
   const token = github === true ? process.env.GITHUB_AUTH : github;
   const hasRepositoryLink = !!context.packageJSON.repository;
+  const gitAuthor = gitName ? `--author "${gitName} <${gitEmail}>"` : '';
+  const noVerify = settings.runGitHooks ? '' : '--no-verify';
   let selected = projects
     .filter(({ name }) => !selectedProjects || selectedProjects.includes(name))
     .filter(({ name, packageJSON }) => {
@@ -340,7 +344,7 @@ export default projects => ({
                       previous.then(() =>
                         execa
                           .shell(
-                            `git add . && git commit -m "release(${project.name}): ${status[
+                            `git add . && git commit ${noVerify} ${gitAuthor} -m "release(${project.name}): ${status[
                               project.name
                             ].newVersion}"`,
                             {
@@ -433,7 +437,7 @@ export default projects => ({
               {
                 title: 'Commits',
                 task: () =>
-                  execa.shell('git push', {
+                  execa.shell(`git push ${noVerify}`, {
                     cwd: context.directory,
                   }),
               },
@@ -441,7 +445,7 @@ export default projects => ({
                 title: 'Tags',
                 skip: () => !tag,
                 task: () =>
-                  execa.shell('git push --tags', {
+                  execa.shell(`git push ${noVerify} --tags`, {
                     cwd: context.directory,
                   }),
               },
