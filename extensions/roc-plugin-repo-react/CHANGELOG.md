@@ -1,3 +1,13 @@
+<a name="0.0.5"></a>
+## 0.0.5 (2017-08-31)
+
+
+### Bug Fixes
+
+* Possible to set author and hooks for publish ([45d3106](https://github.com/rocjs/roc-plugin-repo/commit/45d3106))
+
+
+
 <a name="0.0.4"></a>
 ## 0.0.4 (2017-08-24)
 

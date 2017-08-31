@@ -74,17 +74,19 @@ roc repo storybook [projects]
 
 #### Arguments
 
-| Name      | Description                                          | Default | Type            | Required | Can be empty |
-| --------- | ---------------------------------------------------- | ------- | --------------- | -------- | ------------ |
-| projects  | Projects to use                                      |         | `Array(String)` | No       | Yes          |
+| Name        | Description                                                  | Default | Type            | Required | Can be empty |
+| ----------- | ------------------------------------------------------------ | ------- | --------------- | -------- | ------------ |
+| projects    | Projects to use                                              |         | `Array(String)` | No       | Yes          |
 
 #### Command options
 
-| Name      | Description                                          | Default | Type            | Required | Can be empty |
-| --------- | ---------------------------------------------------- | ------- | --------------- | -------- | ------------ |
-| --build   | If static files for the Storybook should be built    | `false` | `Boolean`       | No       |              |
-| --port    | The port to start React Storybook on                 | `9001`  | `Integer`       | No       |              |
-| --publish | If the Storybook should be published to GitHub pages | `false` | `Boolean`       | No       |              |
+| Name        | Description                                                  | Default | Type            | Required | Can be empty |
+| ----------- | ------------------------------------------------------------ | ------- | --------------- | -------- | ------------ |
+| --build     | If static files for the Storybook should be built            | `false` | `Boolean`       | No       |              |
+| --git-email | Email to use for Git author over the default when publishing |         | `String`        | No       | Yes          |
+| --git-name  | Name to use for Git author over the default when publishing  |         | `String`        | No       | Yes          |
+| --port      | The port to start React Storybook on                         | `9001`  | `Integer`       | No       |              |
+| --publish   | If the Storybook should be published to GitHub pages         | `false` | `Boolean`       | No       |              |
 
 ####  Defined by extensions
 roc-plugin-repo-react

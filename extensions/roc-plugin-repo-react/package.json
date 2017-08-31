@@ -1,6 +1,6 @@
 {
   "name": "roc-plugin-repo-react",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Roc plugin making it easy to manage React repositories",
   "main": "lib/index.js",
   "files": [
