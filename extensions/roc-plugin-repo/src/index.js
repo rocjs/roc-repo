@@ -4,6 +4,7 @@ import log from 'roc/log/default/small';
 import readPkg from 'read-pkg';
 import { lazyFunctionRequire, generateDependencies } from 'roc';
 import glob from 'glob';
+import { yellow } from 'chalk';
 
 import { invokeHook, packageJSON } from './util';
 import { config, meta } from './config';
@@ -305,7 +306,10 @@ module.exports.roc = {
               `Found the following:\n${projects
                 .map(
                   project =>
-                    ` — ${project.name} (${project.packageJSON.version})`,
+                    ` — ${project.name} (${project.packageJSON
+                      .version})${project.packageJSON.private
+                      ? ` ${yellow('Private')}`
+                      : ''}`,
                 )
                 .join('\n')}`,
             );
