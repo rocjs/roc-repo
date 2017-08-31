@@ -11,7 +11,7 @@ import { createLink, createBinaryLink } from './utils/install';
 import generateStatus from '../semver/generateStatus';
 import { getNextVersions, createVersionsDoesNotMatch } from '../semver/utils';
 
-const removeDependencies = (
+const removeDependenciesToBeLinked = (
   dependencies = {},
   localDependencies,
   ignoreSemVer,
@@ -33,6 +33,22 @@ const removeDependencies = (
   return newDependencies;
 };
 
+const removeDependenciesThatWhereInstalled = (
+  dependencies = {},
+  localDependencies,
+  ignoreSemVer,
+) => {
+  const removeDependenciesThatShouldBeLinked = createVersionsDoesNotMatch(
+    localDependencies,
+    dependencies,
+    ignoreSemVer,
+  );
+
+  return Object.keys(dependencies)
+    .filter(dependency => Object.keys(localDependencies).includes(dependency))
+    .filter(dependency => !removeDependenciesThatShouldBeLinked(dependency));
+};
+
 const install = async (
   project,
   binary,
@@ -41,15 +57,15 @@ const install = async (
 ) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
   const pathToPackageJSONBackup = `${pathToPackageJSON}.backup`;
-  const packageJSON = readPkg.sync(pathToPackageJSON);
+  const packageJSON = await readPkg(pathToPackageJSON);
   const tempPackageJSON = Object.assign({}, packageJSON);
 
-  tempPackageJSON.dependencies = removeDependencies(
+  tempPackageJSON.dependencies = removeDependenciesToBeLinked(
     packageJSON.dependencies,
     localDependencies,
     ignoreSemVer,
   );
-  tempPackageJSON.devDependencies = removeDependencies(
+  tempPackageJSON.devDependencies = removeDependenciesToBeLinked(
     packageJSON.devDependencies,
     localDependencies,
     ignoreSemVer,
@@ -79,14 +95,27 @@ const install = async (
   );
 };
 
-const link = async (project, binary, localDependencies, { concurrent }) => {
+const link = async (
+  project,
+  binary,
+  localDependencies,
+  { concurrent, ignoreSemVer },
+) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
 
   const packageJSON = await readPkg(pathToPackageJSON);
-  const toLink = Object.keys({
-    ...packageJSON.dependencies,
-    ...packageJSON.devDependencies,
-  }).filter(dependency => Object.keys(localDependencies).includes(dependency));
+  const toLink = [].concat(
+    removeDependenciesThatWhereInstalled(
+      packageJSON.dependencies,
+      localDependencies,
+      ignoreSemVer,
+    ),
+    removeDependenciesThatWhereInstalled(
+      packageJSON.devDependencies,
+      localDependencies,
+      ignoreSemVer,
+    ),
+  );
 
   if (toLink.length === 0) {
     return Promise.resolve();
@@ -173,7 +202,10 @@ export default projects => async ({
             selected.map(project => ({
               title: project.name,
               task: () =>
-                link(project, binary, localDependencies, { concurrent }),
+                link(project, binary, localDependencies, {
+                  ignoreSemVer,
+                  concurrent,
+                }),
             })),
             { concurrent },
           ),
