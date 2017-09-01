@@ -1,3 +1,15 @@
+<a name="0.0.18"></a>
+## 0.0.18 (2017-09-01)
+
+
+### Bug Fixes
+
+* Fix issue with GitHub release for non monorepo ([3ba90c7](https://github.com/rocjs/roc-plugin-repo/commit/3ba90c7))
+* Fix problem with GitHub releases when using --from ([e1a54d9](https://github.com/rocjs/roc-plugin-repo/commit/e1a54d9))
+* Set Git commiter as well as author for release ([01f5e26](https://github.com/rocjs/roc-plugin-repo/commit/01f5e26))
+
+
+
 <a name="0.0.17"></a>
 ## 0.0.17 (2017-09-01)
 
