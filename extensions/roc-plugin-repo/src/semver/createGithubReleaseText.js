@@ -15,11 +15,8 @@ export default async function createGithubReleaseText(
 ) {
   individual = !isMonorepo ? true : individual; // eslint-disable-line no-param-reassign
 
-  // Replace with this when the latest changes have been merged for this package
-  // const angular = require('conventional-changelog-angular');
-  // const { writerOpts: { transform } } = await angular;
-  const transform = require('./conventional-changelog-angular-transformer')
-    .default;
+  const angular = require('conventional-changelog-angular');
+  const { writerOpts: { transform } } = await angular;
 
   const latest = await getLatestCommitsSinceRelease('angular');
   const templates = await getTemplates(individual);
