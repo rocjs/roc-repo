@@ -18,7 +18,7 @@ export default async function updateChangelogs(projects, isMonorepo, from) {
 
   return Promise.all(
     projects.map(project =>
-      generateChangelogForProject(project, latest[project.name]),
+      generateChangelogForProject(project, latest[project.name] || from),
     ),
   );
 }
