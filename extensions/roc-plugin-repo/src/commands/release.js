@@ -42,7 +42,6 @@ export default projects => ({
   const individual = !collectedRelease;
   const token = github === true ? process.env.GITHUB_AUTH : github;
   const hasRepositoryLink = !!context.packageJSON.repository;
-  const gitAuthor = gitName ? `--author "${gitName} <${gitEmail}>"` : '';
   const noVerify = settings.runGitHooks ? '' : '--no-verify';
   let selected = projects
     .filter(({ name }) => !selectedProjects || selectedProjects.includes(name))
@@ -346,11 +345,17 @@ export default projects => ({
                       previous.then(() =>
                         execa
                           .shell(
-                            `git add . && git commit ${noVerify} ${gitAuthor} -m "release(${project.name}): ${status[
+                            `git add . && git commit ${noVerify} -m "release(${project.name}): ${status[
                               project.name
                             ].newVersion}"`,
                             {
                               cwd: project.path,
+                              env: {
+                                GIT_COMMITTER_NAME: gitName,
+                                GIT_COMMITTER_EMAIL: gitEmail,
+                                GIT_AUTHOR_NAME: gitName,
+                                GIT_AUTHOR_EMAIL: gitEmail,
+                              },
                             },
                           )
                           .then(async () => {
