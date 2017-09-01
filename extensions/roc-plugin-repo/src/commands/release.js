@@ -314,6 +314,7 @@ export default projects => ({
                           [project],
                           isMonorepo,
                           individual,
+                          from,
                         );
 
                         if (!token) {
@@ -330,6 +331,7 @@ export default projects => ({
                     selectedToBeReleased,
                     isMonorepo,
                     individual,
+                    from,
                   );
 
                   return Promise.resolve();

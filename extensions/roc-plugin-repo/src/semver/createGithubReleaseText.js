@@ -12,13 +12,14 @@ export default async function createGithubReleaseText(
   projects,
   isMonorepo,
   individual,
+  from,
 ) {
   individual = !isMonorepo ? true : individual; // eslint-disable-line no-param-reassign
 
   const angular = require('conventional-changelog-angular');
   const { writerOpts: { transform } } = await angular;
 
-  const latest = await getLatestCommitsSinceRelease('angular');
+  const latest = await getLatestCommitsSinceRelease('angular', from);
   const templates = await getTemplates(individual);
   const generateReleaseNotesForProject = createGenerateReleaseNotesForProject(
     templates,
@@ -29,7 +30,7 @@ export default async function createGithubReleaseText(
 
   return Promise.all(
     projects.map(project =>
-      generateReleaseNotesForProject(project, latest[project.name]),
+      generateReleaseNotesForProject(project, latest[project.name] || from),
     ),
   ).then(
     releaseNotes =>
