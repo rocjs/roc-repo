@@ -1,3 +1,13 @@
+<a name="0.0.16"></a>
+## 0.0.16 (2017-09-01)
+
+
+### Bug Fixes
+
+* Use latest version of conventional-changelog ([f2dceec](https://github.com/rocjs/roc-plugin-repo/commit/f2dceec))
+
+
+
 <a name="0.0.15"></a>
 ## 0.0.15 (2017-08-31)
 
