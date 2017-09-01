@@ -398,10 +398,9 @@ export default projects => ({
                     });
                   }
 
-                  selectedToBeReleased[0].tag = `v${status[
-                    selectedToBeReleased[0].name
-                  ].newVersion}`;
-                  return execa.shell(`git tag ${selectedToBeReleased[0].tag}`, {
+                  ctx.releaseTag = `v${status[selectedToBeReleased[0].name]
+                    .newVersion}`;
+                  return execa.shell(`git tag ${ctx.releaseTag}`, {
                     cwd: context.directory,
                   });
                 },
