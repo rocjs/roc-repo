@@ -1,3 +1,13 @@
+<a name="0.0.17"></a>
+## 0.0.17 (2017-09-01)
+
+
+### Bug Fixes
+
+* Solve issue when doing a release and using --from ([94ce68c](https://github.com/rocjs/roc-plugin-repo/commit/94ce68c))
+
+
+
 <a name="0.0.16"></a>
 ## 0.0.16 (2017-09-01)
 
