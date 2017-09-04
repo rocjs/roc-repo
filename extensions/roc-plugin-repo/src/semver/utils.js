@@ -28,7 +28,7 @@ export function incrementToString(increment) {
   return '';
 }
 
-export function getLatestCommitsSinceRelease(preset, from) {
+export function getLatestCommitsSinceRelease(preset, from, singleProjectName) {
   return new Promise(resolve => {
     const latest = {};
     conventionalChangelog(
@@ -37,7 +37,11 @@ export function getLatestCommitsSinceRelease(preset, from) {
         append: true,
         transform(commit, cb) {
           if (commit.type === 'release') {
-            latest[commit.scope] = commit.hash;
+            if (!singleProjectName) {
+              latest[commit.scope] = commit.hash;
+            } else {
+              latest[singleProjectName] = commit.hash;
+            }
           }
           cb();
         },

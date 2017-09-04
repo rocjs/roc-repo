@@ -61,7 +61,10 @@ export default function generateStatus(projects, isMonorepo, from, prerelease) {
           if (toPush) {
             status[project].commits.push(commit);
           }
-          if (commit.type === 'release' && commit.scope === project) {
+          if (
+            commit.type === 'release' &&
+            (commit.scope === project || !isMonorepo)
+          ) {
             status[project].increment = versions.NOTHING;
             status[project].currentVersion = commit.subject;
             status[project].commits = [];
@@ -70,7 +73,10 @@ export default function generateStatus(projects, isMonorepo, from, prerelease) {
             status[project].currentVersionPrerelease = undefined;
             status[project].currentPrerelease = undefined;
           }
-          if (commit.type === 'prerelease' && commit.scope === project) {
+          if (
+            commit.type === 'prerelease' &&
+            (commit.scope === project || !isMonorepo)
+          ) {
             status[project].currentVersionPrerelease = commit.subject;
             status[project].currentPrerelease = semver.prerelease(
               commit.subject,

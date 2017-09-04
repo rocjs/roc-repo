@@ -345,9 +345,9 @@ export default projects => ({
                       previous.then(() =>
                         execa
                           .shell(
-                            `git add . && git commit ${noVerify} -m "release(${project.name}): ${status[
-                              project.name
-                            ].newVersion}"`,
+                            `git add . && git commit ${noVerify} -m "release${isMonorepo
+                              ? `(${project.name})`
+                              : ''}: ${status[project.name].newVersion}"`,
                             {
                               cwd: project.path,
                               env: {

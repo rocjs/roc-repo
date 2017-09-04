@@ -19,7 +19,11 @@ export default async function createGithubReleaseText(
   const angular = require('conventional-changelog-angular');
   const { writerOpts: { transform } } = await angular;
 
-  const latest = await getLatestCommitsSinceRelease('angular', from);
+  const latest = await getLatestCommitsSinceRelease(
+    'angular',
+    from,
+    !isMonorepo && projects[0].name,
+  );
   const templates = await getTemplates(individual);
   const generateReleaseNotesForProject = createGenerateReleaseNotesForProject(
     templates,

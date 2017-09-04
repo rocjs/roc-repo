@@ -11,7 +11,11 @@ import {
 } from './utils';
 
 export default async function updateChangelogs(projects, isMonorepo, from) {
-  const latest = await getLatestCommitsSinceRelease('angular', from);
+  const latest = await getLatestCommitsSinceRelease(
+    'angular',
+    from,
+    !isMonorepo && projects[0].name,
+  );
   const generateChangelogForProject = createGenerateChangelogForProject(
     isMonorepo,
   );
