@@ -1,7 +1,14 @@
 import conventionalChangelog from 'conventional-changelog';
 import semver from 'semver';
+import { upperCase } from 'lodash';
 
-import { isBreakingChange, versions, incrementToString } from './utils';
+import {
+  isBreakingChange,
+  versions,
+  incrementToString,
+  getMultiScopes,
+  getAutoScopes,
+} from './utils';
 
 export default function generateStatus(projects, isMonorepo, from, prerelease) {
   return new Promise(resolve => {
@@ -25,65 +32,87 @@ export default function generateStatus(projects, isMonorepo, from, prerelease) {
         preset: 'angular',
         append: true,
         transform(commit, cb) {
+          const multiScopes = getMultiScopes(commit, isMonorepo);
+          const autoScopes = getAutoScopes(commit, isMonorepo, projects);
           // We are only interested in commits which scope is one of our projects
           if (
             isMonorepo &&
+            upperCase(commit.scope) !== 'ALL' &&
+            multiScopes.length === 0 &&
+            autoScopes.length === 0 &&
             !projects.find(({ name }) => name === commit.scope)
           ) {
             cb();
             return;
           }
 
-          const project = isMonorepo ? commit.scope : projects[0].name;
+          // The projects that are effected by the scope
+          // Will always be the first project in a non monorepo
+          let affectedProjects = [projects[0].name];
+
+          if (isMonorepo) {
+            if (upperCase(commit.scope) === 'ALL') {
+              affectedProjects = Object.keys(status);
+            } else if (multiScopes.length > 0) {
+              affectedProjects = multiScopes;
+            } else if (autoScopes.length > 0) {
+              affectedProjects = autoScopes;
+            } else {
+              affectedProjects = [commit.scope];
+            }
+          }
+
           let toPush = null;
           if (commit.type === 'fix' || commit.type === 'perf') {
-            // TODO Documented
-            status[project].increment = Math.max(
-              status[project].increment,
-              versions.PATCH,
-            );
+            affectedProjects.forEach(p => {
+              status[p].increment = Math.max(
+                status[p].increment,
+                versions.PATCH,
+              );
+            });
             toPush = commit;
           }
           if (commit.type === 'feat' || commit.type === 'revert') {
-            status[project].increment = Math.max(
-              status[project].increment,
-              versions.MINOR,
-            );
+            affectedProjects.forEach(p => {
+              status[p].increment = Math.max(
+                status[p].increment,
+                versions.MINOR,
+              );
+            });
             toPush = commit;
           }
           if (isBreakingChange(commit)) {
-            status[project].increment = Math.max(
-              status[project].increment,
-              versions.MAJOR,
-            );
+            affectedProjects.forEach(p => {
+              status[p].increment = Math.max(
+                status[p].increment,
+                versions.MAJOR,
+              );
+            });
             toPush = commit;
           }
           if (toPush) {
-            status[project].commits.push(commit);
+            affectedProjects.forEach(p => {
+              status[p].commits.push(commit);
+            });
           }
-          if (
-            commit.type === 'release' &&
-            (commit.scope === project || !isMonorepo)
-          ) {
-            status[project].increment = versions.NOTHING;
-            status[project].currentVersion = commit.subject;
-            status[project].commits = [];
+          if (commit.type === 'release') {
+            status[affectedProjects[0]].increment = versions.NOTHING;
+            status[affectedProjects[0]].currentVersion = commit.subject;
+            status[affectedProjects[0]].commits = [];
 
             // If we hit a release we also want to reset the prerelease
-            status[project].currentVersionPrerelease = undefined;
-            status[project].currentPrerelease = undefined;
+            status[affectedProjects[0]].currentVersionPrerelease = undefined;
+            status[affectedProjects[0]].currentPrerelease = undefined;
           }
-          if (
-            commit.type === 'prerelease' &&
-            (commit.scope === project || !isMonorepo)
-          ) {
-            status[project].currentVersionPrerelease = commit.subject;
-            status[project].currentPrerelease = semver.prerelease(
+          if (commit.type === 'prerelease') {
+            status[affectedProjects[0]].currentVersionPrerelease =
+              commit.subject;
+            status[affectedProjects[0]].currentPrerelease = semver.prerelease(
               commit.subject,
             )[0];
 
             if (prerelease) {
-              status[project].commits = [];
+              status[affectedProjects[0]].commits = [];
             }
           }
           cb();
@@ -91,6 +120,14 @@ export default function generateStatus(projects, isMonorepo, from, prerelease) {
       },
       {},
       { reverse: true, from },
+      {
+        noteKeywords: [
+          'SCOPE',
+          'SCOPES',
+          'BREAKING CHANGE',
+          'BREAKING CHANGES',
+        ],
+      },
     )
       .on('end', () => {
         Object.keys(status).forEach(project => {

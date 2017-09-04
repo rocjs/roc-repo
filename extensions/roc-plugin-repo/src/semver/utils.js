@@ -1,6 +1,8 @@
 import path from 'path';
 import conventionalChangelog from 'conventional-changelog';
 import semver from 'semver';
+import { upperCase } from 'lodash';
+import { executeSync } from 'roc';
 
 export const versions = {
   NOTHING: 0,
@@ -54,7 +56,7 @@ export function getLatestCommitsSinceRelease(preset, from, singleProjectName) {
   });
 }
 
-export function conventionalChangelogOptions(preset, isMonorepo) {
+export function conventionalChangelogOptions(preset, isMonorepo, projects) {
   return project => ({
     preset,
     append: true,
@@ -62,12 +64,23 @@ export function conventionalChangelogOptions(preset, isMonorepo) {
       path: path.join(project.path, 'package.json'),
     },
     transform(commit, cb) {
-      if (isMonorepo && commit.scope === project.name) {
+      if (!isMonorepo) {
+        return cb(null, commit);
+      } else if (
+        commit.scope === project.name ||
+        upperCase(commit.scope) === 'ALL' ||
+        getMultiScopes(commit, isMonorepo).includes(project.name) ||
+        getAutoScopes(commit, isMonorepo, projects).includes(project.name)
+      ) {
         // Remove the scope if we are using monorepos since it will
         // be the same for the entire changelog
         commit.scope = null; // eslint-disable-line no-param-reassign
-        return cb(null, commit);
-      } else if (!isMonorepo) {
+        // eslint-disable-next-line no-param-reassign
+        commit.notes = commit.notes.filter(
+          note =>
+            upperCase(note.title) !== 'SCOPES' &&
+            upperCase(note.title) !== 'SCOPE',
+        );
         return cb(null, commit);
       }
 
@@ -131,4 +144,37 @@ export function getDefaultPrerelease(prerelease) {
   }
 
   return prerelease;
+}
+
+export function getMultiScopes(commit, isMonorepo) {
+  if (isMonorepo && upperCase(commit.scope) === 'MULTI') {
+    return (commit.notes.find(
+      ({ title }) =>
+        upperCase(title) === 'SCOPE' || upperCase(title) === 'SCOPES',
+    ) || { text: '' }).text
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length !== 0);
+  }
+
+  return [];
+}
+
+export function getAutoScopes(commit, isMonorepo, projects) {
+  if (isMonorepo && commit.scope === '*') {
+    return projects
+      .map(project => {
+        const result = executeSync(
+          `git show -s ${commit.hash} ${project.path}`,
+          { silent: true },
+        );
+        if (result.length > 0) {
+          return project.name;
+        }
+        return undefined;
+      })
+      .filter(r => Boolean(r));
+  }
+
+  return [];
 }

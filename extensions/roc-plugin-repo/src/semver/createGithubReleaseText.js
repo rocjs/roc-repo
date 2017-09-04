@@ -29,6 +29,7 @@ export default async function createGithubReleaseText(
     templates,
     transform,
     isMonorepo,
+    projects,
   );
   const projectTable = individual ? '' : createTable(projects);
 
@@ -49,18 +50,26 @@ function createGenerateReleaseNotesForProject(
   templates,
   transform,
   isMonorepo,
+  projects,
 ) {
   return (project, from) =>
     new Promise(resolve => {
       let releaseText = '';
       conventionalChangelog(
-        conventionalChangelogOptions('angular', isMonorepo)(project),
+        conventionalChangelogOptions('angular', isMonorepo, projects)(project),
         {
           title: project.name,
           directory: `${project.directory}/${project.folder}`,
         },
         { from, reverse: true },
-        undefined,
+        {
+          noteKeywords: [
+            'SCOPE',
+            'SCOPES',
+            'BREAKING CHANGE',
+            'BREAKING CHANGES',
+          ],
+        },
         {
           transform: angularTransformerOverride(transform),
           ...templates,

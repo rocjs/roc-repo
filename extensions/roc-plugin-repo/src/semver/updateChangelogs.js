@@ -18,6 +18,7 @@ export default async function updateChangelogs(projects, isMonorepo, from) {
   );
   const generateChangelogForProject = createGenerateChangelogForProject(
     isMonorepo,
+    projects,
   );
 
   return Promise.all(
@@ -27,16 +28,26 @@ export default async function updateChangelogs(projects, isMonorepo, from) {
   );
 }
 
-function createGenerateChangelogForProject(isMonorepo) {
+function createGenerateChangelogForProject(isMonorepo, projects) {
   return (project, from) =>
     new Promise(resolve => {
       const changelog = path.join(project.path, 'CHANGELOG.md');
       const tmp = tempfile();
       return readStream(changelog).then(changelogReadStream => {
         conventionalChangelog(
-          conventionalChangelogOptions('angular', isMonorepo)(project),
+          conventionalChangelogOptions('angular', isMonorepo, projects)(
+            project,
+          ),
           {},
           { from, reverse: true },
+          {
+            noteKeywords: [
+              'SCOPE',
+              'SCOPES',
+              'BREAKING CHANGE',
+              'BREAKING CHANGES',
+            ],
+          },
         )
           .pipe(addStream(changelogReadStream))
           .pipe(fs.createWriteStream(tmp))
