@@ -1,3 +1,14 @@
+<a name="0.0.19"></a>
+## 0.0.19 (2017-09-04)
+
+
+### Bug Fixes
+
+* Do not use scope for release commits in non mono ([de747d0](https://github.com/rocjs/roc-plugin-repo/commit/de747d0))
+* Support for an ALL, MULTI and * scope, for mono ([4c82e4b](https://github.com/rocjs/roc-plugin-repo/commit/4c82e4b))
+
+
+
 <a name="0.0.18"></a>
 ## 0.0.18 (2017-09-01)
 
