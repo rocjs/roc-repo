@@ -1,3 +1,13 @@
+<a name="0.0.22"></a>
+## 0.0.22 (2017-09-07)
+
+
+### Bug Fixes
+
+* Fix bug where git user would be undefined ([6df8aed](https://github.com/rocjs/roc-plugin-repo/commit/6df8aed))
+
+
+
 <a name="0.0.21"></a>
 ## 0.0.21 (2017-09-07)
 
