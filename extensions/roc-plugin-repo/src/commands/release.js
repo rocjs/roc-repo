@@ -43,6 +43,20 @@ export default projects => ({
   const token = github === true ? process.env.GITHUB_AUTH : github;
   const hasRepositoryLink = !!context.packageJSON.repository;
   const noVerify = settings.runGitHooks ? '' : '--no-verify';
+  const gitUserEnv = {
+    ...(gitName
+      ? {
+          GIT_COMMITTER_NAME: gitName,
+          GIT_AUTHOR_NAME: gitName,
+        }
+      : {}),
+    ...(gitEmail
+      ? {
+          GIT_COMMITTER_EMAIL: gitEmail,
+          GIT_AUTHOR_EMAIL: gitEmail,
+        }
+      : {}),
+  };
   let selected = projects
     .filter(({ name }) => !selectedProjects || selectedProjects.includes(name))
     .filter(({ name, packageJSON }) => {
@@ -363,12 +377,7 @@ export default projects => ({
                             {
                               cwd: project.path,
                               preferLocal: false,
-                              env: {
-                                GIT_COMMITTER_NAME: gitName,
-                                GIT_COMMITTER_EMAIL: gitEmail,
-                                GIT_AUTHOR_NAME: gitName,
-                                GIT_AUTHOR_EMAIL: gitEmail,
-                              },
+                              env: gitUserEnv,
                             },
                           )
                           .then(async () => {
