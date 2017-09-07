@@ -1,3 +1,13 @@
+<a name="0.0.21"></a>
+## 0.0.21 (2017-09-07)
+
+
+### Bug Fixes
+
+* Fix issue with auto release on Travis ([46cc939](https://github.com/rocjs/roc-plugin-repo/commit/46cc939))
+
+
+
 <a name="0.0.20"></a>
 ## 0.0.20 (2017-09-07)
 
