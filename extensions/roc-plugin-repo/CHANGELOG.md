@@ -1,3 +1,17 @@
+<a name="0.0.20"></a>
+## 0.0.20 (2017-09-07)
+
+
+### Bug Fixes
+
+* Correctly generate changelogs when specifying from ([da54bcd](https://github.com/rocjs/roc-plugin-repo/commit/da54bcd))
+* Display current version for status better ([5cf3e83](https://github.com/rocjs/roc-plugin-repo/commit/5cf3e83))
+* Fix a problem when creating commits in release cmd ([480601b](https://github.com/rocjs/roc-plugin-repo/commit/480601b))
+* Support merge commits in a better way for release ([8155828](https://github.com/rocjs/roc-plugin-repo/commit/8155828))
+* Support Travis when doing automatic releases ([fbf4947](https://github.com/rocjs/roc-plugin-repo/commit/fbf4947))
+
+
+
 <a name="0.0.19"></a>
 ## 0.0.19 (2017-09-04)
 
