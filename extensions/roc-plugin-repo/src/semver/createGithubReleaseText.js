@@ -35,7 +35,7 @@ export default async function createGithubReleaseText(
 
   return Promise.all(
     projects.map(project =>
-      generateReleaseNotesForProject(project, latest[project.name] || from),
+      generateReleaseNotesForProject(project, from || latest[project.name]),
     ),
   ).then(
     releaseNotes =>
