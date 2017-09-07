@@ -350,6 +350,7 @@ export default projects => ({
                               : ''}: ${status[project.name].newVersion}"`,
                             {
                               cwd: project.path,
+                              preferLocal: false,
                               env: {
                                 GIT_COMMITTER_NAME: gitName,
                                 GIT_COMMITTER_EMAIL: gitEmail,
