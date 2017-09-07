@@ -30,20 +30,55 @@ export function incrementToString(increment) {
   return '';
 }
 
-export function getLatestCommitsSinceRelease(preset, from, singleProjectName) {
+export function incrementToValue(increment) {
+  if (increment === 'patch') {
+    return versions.PATCH;
+  } else if (increment === 'minor') {
+    return versions.MINOR;
+  } else if (increment === 'major') {
+    return versions.MAJOR;
+  }
+
+  return versions.NOTHING;
+}
+
+export function getLatestCommitsSinceRelease(
+  preset,
+  from,
+  projects,
+  isMonorepo,
+) {
   return new Promise(resolve => {
-    const latest = {};
+    const latest = projects.reduce(
+      (previous, project) => ({
+        ...previous,
+        [project.name]: {
+          release: {},
+          prerelease: {},
+        },
+      }),
+      {},
+    );
     conventionalChangelog(
       {
         preset,
         append: true,
         transform(commit, cb) {
           if (commit.type === 'release') {
-            if (!singleProjectName) {
-              latest[commit.scope] = commit.hash;
-            } else {
-              latest[singleProjectName] = commit.hash;
-            }
+            const project = isMonorepo ? commit.scope : projects[0].name;
+
+            latest[project] = {
+              release: commit,
+              prerelease: {},
+            };
+          }
+          if (commit.type === 'prerelease') {
+            const project = isMonorepo ? commit.scope : projects[0].name;
+
+            latest[project] = {
+              ...latest[project],
+              prerelease: commit,
+            };
           }
           cb();
         },

@@ -10,20 +10,31 @@ import {
   conventionalChangelogOptions,
 } from './utils';
 
-export default async function updateChangelogs(projects, isMonorepo, from) {
+export default async function updateChangelogs(
+  projects,
+  isMonorepo,
+  from,
+  prerelease,
+) {
   const latest = await getLatestCommitsSinceRelease(
     'angular',
     from,
-    !isMonorepo && projects[0].name,
+    projects,
+    isMonorepo,
   );
   const generateChangelogForProject = createGenerateChangelogForProject(
     isMonorepo,
     projects,
   );
 
+  const fromRelease = project =>
+    prerelease && latest[project].prerelease.hash
+      ? latest[project].prerelease.hash
+      : latest[project].release.hash;
+
   return Promise.all(
     projects.map(project =>
-      generateChangelogForProject(project, from || latest[project.name]),
+      generateChangelogForProject(project, from || fromRelease(project.name)),
     ),
   );
 }

@@ -13,6 +13,7 @@ export default async function createGithubReleaseText(
   isMonorepo,
   individual,
   from,
+  prerelease,
 ) {
   individual = !isMonorepo ? true : individual; // eslint-disable-line no-param-reassign
 
@@ -22,7 +23,8 @@ export default async function createGithubReleaseText(
   const latest = await getLatestCommitsSinceRelease(
     'angular',
     from,
-    !isMonorepo && projects[0].name,
+    projects,
+    isMonorepo,
   );
   const templates = await getTemplates(individual);
   const generateReleaseNotesForProject = createGenerateReleaseNotesForProject(
@@ -32,10 +34,17 @@ export default async function createGithubReleaseText(
     projects,
   );
   const projectTable = individual ? '' : createTable(projects);
+  const fromRelease = project =>
+    prerelease && latest[project].prerelease.hash
+      ? latest[project].prerelease.hash
+      : latest[project].release.hash;
 
   return Promise.all(
     projects.map(project =>
-      generateReleaseNotesForProject(project, from || latest[project.name]),
+      generateReleaseNotesForProject(
+        project,
+        from || fromRelease(project.name),
+      ),
     ),
   ).then(
     releaseNotes =>

@@ -299,7 +299,12 @@ export default projects => ({
               {
                 title: 'Updating CHANGELOG.md',
                 task: () =>
-                  updateChangelogs(selectedToBeReleased, !!settings.mono, from),
+                  updateChangelogs(
+                    selectedToBeReleased,
+                    !!settings.mono,
+                    from,
+                    prereleaseTag,
+                  ),
               },
               {
                 title: 'Prepare GitHub release',
@@ -314,6 +319,7 @@ export default projects => ({
                           isMonorepo,
                           individual,
                           from,
+                          prereleaseTag,
                         );
 
                         if (!token) {
@@ -331,6 +337,7 @@ export default projects => ({
                     isMonorepo,
                     individual,
                     from,
+                    prereleaseTag,
                   );
 
                   return Promise.resolve();
