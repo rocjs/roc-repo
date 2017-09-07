@@ -185,10 +185,15 @@ export default projects => ({
                         },
                         {
                           title: 'Checking remote history',
+                          // This check might fail on CI server that checkout using deatached HEAD
+                          // We have added support for Travis here and other CI server might need extra care as well
                           task: () =>
                             execa
                               .shell(
-                                'git rev-list --count --left-only @{u}...HEAD',
+                                `git rev-list --count --left-only ${isCI &&
+                                process.env.TRAVIS_BRANCH
+                                  ? process.env.TRAVIS_BRANCH
+                                  : ''}@{u}...HEAD`,
                               )
                               .then(({ stdout }) => {
                                 if (stdout !== '0') {
