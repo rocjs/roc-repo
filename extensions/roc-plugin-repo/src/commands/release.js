@@ -456,17 +456,27 @@ export default projects => ({
               {
                 title: 'Commits',
                 task: () =>
-                  execa.shell(`git push ${noVerify}`, {
-                    cwd: context.directory,
-                  }),
+                  execa.shell(
+                    `git push ${isCI && process.env.TRAVIS_BRANCH
+                      ? `origin HEAD:${process.env.TRAVIS_BRANCH}`
+                      : ''} ${noVerify}`,
+                    {
+                      cwd: context.directory,
+                    },
+                  ),
               },
               {
                 title: 'Tags',
                 skip: () => !tag,
                 task: () =>
-                  execa.shell(`git push ${noVerify} --tags`, {
-                    cwd: context.directory,
-                  }),
+                  execa.shell(
+                    `git push ${isCI && process.env.TRAVIS_BRANCH
+                      ? `origin HEAD:${process.env.TRAVIS_BRANCH}`
+                      : ''} ${noVerify} --tags`,
+                    {
+                      cwd: context.directory,
+                    },
+                  ),
               },
             ]),
         },
