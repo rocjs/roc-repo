@@ -30,7 +30,9 @@ const report = (status, isMonorepo, prerelease) => {
       incrementToString(status[project].increment).toUpperCase(),
     )(
       changes,
-      `${project} - ${status[project].currentVersion} -> ${status[project]
+      `${project} - ${prerelease
+        ? status[project].packageJSON.version
+        : status[project].currentVersion} -> ${status[project]
         .newVersion}${!prerelease
         ? ` (current: ${status[project].packageJSON.version})`
         : ''}`,
