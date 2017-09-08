@@ -2,9 +2,11 @@ import GitHubAPI from 'github';
 import getPkgRepo from 'get-pkg-repo';
 import url from 'url';
 
+import waitForTag from './waitForTag';
+
 const pkg = require('../../../package.json');
 
-export default function createGitHubRelease(
+export default async function createGitHubRelease(
   packageJSON,
   text,
   tag,
@@ -31,6 +33,17 @@ export default function createGitHubRelease(
   github.authenticate({
     type: 'oauth',
     token: AUTH_TOKEN,
+  });
+
+  // Make sure the tag exists from the point of view of the GitHUb API
+  // Can take a while for it to be synced after we have pushed the tags
+  await waitForTag({
+    github,
+    tag,
+    owner,
+    repo,
+    tries: 4,
+    delay: 500, // ms
   });
 
   return github.repos.createRelease({
