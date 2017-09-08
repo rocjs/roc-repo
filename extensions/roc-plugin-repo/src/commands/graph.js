@@ -12,6 +12,10 @@ export default projects => async ({
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
   );
 
+  if (selected.length === 0) {
+    return log.warn('No projects were found');
+  }
+
   const status = await generateStatus(projects, true);
   const projectsWithVersions = getNextVersions(status, projects);
 
@@ -88,4 +92,6 @@ export default projects => async ({
         .join('\n')}`,
     );
   }
+
+  return Promise.resolve();
 };
