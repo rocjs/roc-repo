@@ -406,7 +406,7 @@ export default projects => ({
                         project.tag = `${project.name}@${status[project.name]
                           .newVersion}`;
                         return execa.shell(
-                          `git tag ${project.tag} ${project.releaseCommitHash}`,
+                          `git tag ${project.tag} ${project.releaseCommitHash} -a -m ${project.tag}`,
                           {
                             cwd: context.directory,
                           },
@@ -416,9 +416,12 @@ export default projects => ({
                       if (collectedRelease) {
                         const releaseTag = await getTag(collectedRelease);
                         ctx.releaseTag = releaseTag;
-                        return execa.shell(`git tag ${releaseTag}`, {
-                          cwd: context.directory,
-                        });
+                        return execa.shell(
+                          `git tag ${releaseTag} -a -m ${releaseTag}`,
+                          {
+                            cwd: context.directory,
+                          },
+                        );
                       }
 
                       return Promise.resolve();
@@ -427,9 +430,12 @@ export default projects => ({
 
                   ctx.releaseTag = `v${status[selectedToBeReleased[0].name]
                     .newVersion}`;
-                  return execa.shell(`git tag ${ctx.releaseTag}`, {
-                    cwd: context.directory,
-                  });
+                  return execa.shell(
+                    `git tag ${ctx.releaseTag} -a -m ${ctx.releaseTag}`,
+                    {
+                      cwd: context.directory,
+                    },
+                  );
                 },
               },
             ]),
@@ -493,10 +499,10 @@ export default projects => ({
           title: 'Creating GitHub release',
           skip: () =>
             !token || !git || !tag || !github || !push || !hasRepositoryLink,
-          task: async ctx => {
+          task: ctx => {
             if (individual && isMonorepo) {
               return Promise.all(
-                selectedToBeReleased.map(async project =>
+                selectedToBeReleased.map(project =>
                   createGitHubRelease(
                     context.packageJSON,
                     project.releaseText,
