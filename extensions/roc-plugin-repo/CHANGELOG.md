@@ -1,3 +1,15 @@
+<a name="0.0.23"></a>
+## 0.0.23 (2017-09-10)
+
+
+### Bug Fixes
+
+* Added info to graph command for no projects ([81e1bf7](https://github.com/rocjs/roc-plugin-repo/commit/81e1bf7))
+* Create annotated tags in Git ([663d1d3](https://github.com/rocjs/roc-plugin-repo/commit/663d1d3))
+* Solve possible race condition when doing a release ([c2716a0](https://github.com/rocjs/roc-plugin-repo/commit/c2716a0))
+
+
+
 <a name="0.0.22"></a>
 ## 0.0.22 (2017-09-07)
 
