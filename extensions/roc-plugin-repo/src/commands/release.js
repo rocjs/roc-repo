@@ -204,7 +204,7 @@ export default projects => ({
                           task: () =>
                             execa
                               .shell(
-                                `git rev-list --count --left-only ${isCI &&
+                                `git fetch && git rev-list --count --left-only ${isCI &&
                                 process.env.TRAVIS_BRANCH
                                   ? process.env.TRAVIS_BRANCH
                                   : ''}@{u}...HEAD`,
