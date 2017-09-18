@@ -89,44 +89,44 @@ export default projects => ({
       return log.success('Nothing to release.');
     }
 
+    const previousPrerelease = Object.keys(status).filter(
+      project => !!status[project].currentVersionPrerelease,
+    );
+    const previousNotPrerelease = Object.keys(status).filter(
+      project => !status[project].currentVersionPrerelease,
+    );
+    const notMatchPrerelease = previousPrerelease.filter(
+      project => status[project].currentPrerelease !== prereleaseTag,
+    );
+    const matchPrerelease = previousPrerelease.filter(
+      project => status[project].currentPrerelease === prereleaseTag,
+    );
+
+    const extraInfo = project => {
+      const info = [];
+      if (prerelease && notMatchPrerelease.includes(project)) {
+        info.push(
+          `Prerelease tag changed: ${status[project]
+            .currentPrerelease} -> ${prereleaseTag}`,
+        );
+      }
+
+      if (!prerelease && previousPrerelease.includes(project)) {
+        info.push(`Project will be taken out of prerelease`);
+      }
+
+      if (prerelease && previousNotPrerelease.includes(project)) {
+        info.push(`Project will be put into prerelease`);
+      }
+
+      if (info.length > 0) {
+        return `  ${yellow(info.join(', '))}`;
+      }
+
+      return info;
+    };
+
     if (!automatic) {
-      const previousPrerelease = Object.keys(status).filter(
-        project => !!status[project].currentVersionPrerelease,
-      );
-      const previousNotPrerelease = Object.keys(status).filter(
-        project => !status[project].currentVersionPrerelease,
-      );
-      const notMatchPrerelease = previousPrerelease.filter(
-        project => status[project].currentPrerelease !== prereleaseTag,
-      );
-      const matchPrerelease = previousPrerelease.filter(
-        project => status[project].currentPrerelease === prereleaseTag,
-      );
-
-      const extraInfo = project => {
-        const info = [];
-        if (prerelease && notMatchPrerelease.includes(project)) {
-          info.push(
-            `Prerelease tag changed: ${status[project]
-              .currentPrerelease} -> ${prereleaseTag}`,
-          );
-        }
-
-        if (!prerelease && previousPrerelease.includes(project)) {
-          info.push(`Project will be taken out of prerelease`);
-        }
-
-        if (prerelease && previousNotPrerelease.includes(project)) {
-          info.push(`Project will be put into prerelease`);
-        }
-
-        if (info.length > 0) {
-          return `  ${yellow(info.join(', '))}`;
-        }
-
-        return info;
-      };
-
       const projectAnswers = await inquirer.prompt([
         {
           type: 'checkbox',
@@ -160,6 +160,19 @@ export default projects => ({
         // eslint-disable-next-line no-param-reassign
         distTag = distTagAnswers.distTag;
       }
+    } else {
+      // Show a list of the projects that we will release
+      log.info(
+        `The following projects will be released:\n${Object.keys(status)
+          .map(
+            project =>
+              `- ${project} - ${status[project].packageJSON
+                .version} -> ${status[project].newVersion}${extraInfo(
+                project,
+              )}`,
+          )
+          .join('\n')}\n`,
+      );
     }
 
     const selectedToBeReleased = selected.filter(({ name }) =>
