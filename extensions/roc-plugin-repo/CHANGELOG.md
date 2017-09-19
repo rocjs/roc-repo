@@ -1,3 +1,14 @@
+<a name="0.0.24"></a>
+## 0.0.24 (2017-09-19)
+
+
+### Bug Fixes
+
+* Show what projects that will be released in auto ([e0e9887](https://github.com/rocjs/roc-plugin-repo/commit/e0e9887))
+* Synced against our Git remote when doing a release ([4fd9274](https://github.com/rocjs/roc-plugin-repo/commit/4fd9274))
+
+
+
 <a name="0.0.23"></a>
 ## 0.0.23 (2017-09-10)
 
