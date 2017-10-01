@@ -99,6 +99,20 @@ export function conventionalChangelogOptions(preset, isMonorepo, projects) {
       path: path.join(project.path, 'package.json'),
     },
     transform(commit, cb) {
+      if (commit) {
+        // If the type of the commit is a revert commit we
+        // will get the scope from the subject instead
+        if (commit.type === 'revert') {
+          // Assums the Angular convention
+          // eslint-disable-next-line no-unused-vars
+          const [all, type, scope] = commit.subject.match(
+            /^(\w*)(?:\((.*)\))?: (.*)$/,
+          );
+          // eslint-disable-next-line no-param-reassign
+          commit.scope = scope;
+        }
+      }
+
       if (!isMonorepo) {
         return cb(null, commit);
       } else if (
