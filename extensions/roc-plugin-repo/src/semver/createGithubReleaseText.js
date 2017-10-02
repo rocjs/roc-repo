@@ -10,6 +10,7 @@ import {
 
 export default async function createGithubReleaseText(
   projects,
+  status,
   isMonorepo,
   individual,
   from,
@@ -33,7 +34,7 @@ export default async function createGithubReleaseText(
     isMonorepo,
     projects,
   );
-  const projectTable = individual ? '' : createTable(projects);
+  const projectTable = individual ? '' : createTable(projects, status);
   const fromRelease = project =>
     prerelease && latest[project].prerelease.hash
       ? latest[project].prerelease.hash
@@ -136,10 +137,11 @@ function getTemplates(individual) {
   }));
 }
 
-function createTable(projects) {
+function createTable(projects, status) {
   return `${projects.reduce(
     (table, project) =>
-      `${table}\n| ${project.name} | ${project.packageJSON.version} |`,
+      `${table}\n| \`${project.name}\` | \`${status[project.name]
+        .newVersion}\` |`,
     '| Package | Version |\n|---------|---------|',
   )}\n\n`;
 }

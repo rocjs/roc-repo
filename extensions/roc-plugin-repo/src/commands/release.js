@@ -348,6 +348,7 @@ export default projects => ({
                       selectedToBeReleased.map(async project => {
                         const releaseText = await createGithubReleaseText(
                           [project],
+                          status,
                           isMonorepo,
                           individual,
                           from,
@@ -366,6 +367,7 @@ export default projects => ({
 
                   ctx.releaseText = await createGithubReleaseText(
                     selectedToBeReleased,
+                    status,
                     isMonorepo,
                     individual,
                     from,
