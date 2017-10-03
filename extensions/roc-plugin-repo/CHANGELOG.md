@@ -1,3 +1,16 @@
+<a name="0.0.25"></a>
+## 0.0.25 (2017-10-03)
+
+
+### Bug Fixes
+
+* Bumped dependencies ([02d2291](https://github.com/rocjs/roc-plugin-repo/commit/02d2291))
+* Fix issue when performing a prerelease ([2ea611e](https://github.com/rocjs/roc-plugin-repo/commit/2ea611e))
+* Made it work better with revert commits ([46395f1](https://github.com/rocjs/roc-plugin-repo/commit/46395f1))
+* Solved issue when doing collected releases ([3ad7bad](https://github.com/rocjs/roc-plugin-repo/commit/3ad7bad))
+
+
+
 <a name="0.0.24"></a>
 ## 0.0.24 (2017-09-19)
 
