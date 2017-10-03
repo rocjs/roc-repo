@@ -386,7 +386,9 @@ export default projects => ({
                       previous.then(() =>
                         execa
                           .shell(
-                            `git add . && git commit ${noVerify} -m "release${isMonorepo
+                            `git add . && git commit ${noVerify} -m "${prereleaseTag
+                              ? 'pre'
+                              : ''}release${isMonorepo
                               ? `(${project.name})`
                               : ''}: ${status[project.name].newVersion}"`,
                             {
