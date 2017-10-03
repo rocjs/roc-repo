@@ -1,4 +1,5 @@
 import conventionalChangelog from 'conventional-changelog';
+import conventionalCommitsFilter from 'conventional-commits-filter';
 import semver from 'semver';
 import { upperCase } from 'lodash';
 
@@ -61,11 +62,44 @@ export default async function generateStatus(
               ? latest[project].prerelease.hash
               : latest[project].release.hash;
 
+          const commits = [];
+
           conventionalChangelog(
             {
               preset: 'angular',
               append: true,
               transform(commit, cb) {
+                if (commit) {
+                  // If the type of the commit is a revert commit we
+                  // will get the scope from the subject instead
+                  if (commit.type === 'revert') {
+                    // Assums the Angular convention
+                    // eslint-disable-next-line no-unused-vars
+                    const [all, type, scope] = commit.subject.match(
+                      /^(\w*)(?:\((.*)\))?: (.*)$/,
+                    );
+                    // eslint-disable-next-line no-param-reassign
+                    commit.scope = scope;
+                  }
+                  commits.push(commit);
+                }
+
+                cb();
+              },
+            },
+            {},
+            { reverse: true, from: from || fromRelease },
+            {
+              noteKeywords: [
+                'SCOPE',
+                'SCOPES',
+                'BREAKING CHANGE',
+                'BREAKING CHANGES',
+              ],
+            },
+          )
+            .on('end', () => {
+              conventionalCommitsFilter(commits).forEach(commit => {
                 const multiScopes = getMultiScopes(commit, isMonorepo);
                 const autoScopes = getAutoScopes(commit, isMonorepo, projects);
                 // We are only interested in commits which scope is one of our projects
@@ -76,7 +110,6 @@ export default async function generateStatus(
                   !autoScopes.includes(project) &&
                   commit.scope !== project
                 ) {
-                  cb();
                   return;
                 }
 
@@ -105,21 +138,8 @@ export default async function generateStatus(
                 if (toPush) {
                   status[project].commits.push(commit);
                 }
-                cb();
-              },
-            },
-            {},
-            { reverse: true, from: from || fromRelease },
-            {
-              noteKeywords: [
-                'SCOPE',
-                'SCOPES',
-                'BREAKING CHANGE',
-                'BREAKING CHANGES',
-              ],
-            },
-          )
-            .on('end', () => {
+              });
+
               resolve();
             })
             .resume();
