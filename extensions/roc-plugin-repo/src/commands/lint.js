@@ -5,8 +5,8 @@ import log from 'roc/log/default/small';
 
 const eslint = require.resolve('eslint/bin/eslint');
 
-const eslintCommand = (project, fix, config, output, ignoreFile) =>
-  `${eslint} ${config}${project.path} --ignore-path '${ignoreFile}' --ignore-pattern '${output}' ${fix
+const eslintCommand = (project, fix, config, ignorePattern, ignoreFile) =>
+  `${eslint} ${config}${project.path} --ignore-path '${ignoreFile}' --ignore-pattern '${ignorePattern}' ${fix
     ? '--fix'
     : ''}`;
 
@@ -46,11 +46,19 @@ export default projects => ({
 
   return Promise.all(
     selected
-      .map(project =>
-        execute(
-          eslintCommand(project, fix, config, settings.output, ignoreFile),
-        ),
-      )
+      .map(project => {
+        const ignorePattern = path.join(
+          path.relative(
+            context.directory,
+            path.resolve(project.path, settings.output),
+          ),
+          '*',
+        );
+
+        return execute(
+          eslintCommand(project, fix, config, ignorePattern, ignoreFile),
+        );
+      })
       .map(promise => promise.then(() => 0, () => 1)),
   ).then(results => {
     const status = results.reduce((previous, current) =>
