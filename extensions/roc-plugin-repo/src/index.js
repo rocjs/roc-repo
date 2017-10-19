@@ -197,6 +197,15 @@ module.exports.roc = {
             description: 'Run concurrently',
             default: 2,
           },
+          prerelease: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isString,
+            ),
+            default: false,
+            description:
+              'If a prerelease should be done, and what name that should be used for the tag, will default to "alpha"',
+          },
         },
       },
       build: {
@@ -267,6 +276,17 @@ module.exports.roc = {
           projects: {
             validator: validators.isArray(validators.isString),
             description: 'Projects to use',
+          },
+        },
+        options: {
+          prerelease: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isString,
+            ),
+            default: false,
+            description:
+              'If a prerelease should be done, and what name that should be used for the tag, will default to "alpha"',
           },
         },
       },

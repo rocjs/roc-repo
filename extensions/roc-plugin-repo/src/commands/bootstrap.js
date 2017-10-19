@@ -9,7 +9,11 @@ import Listr from 'listr';
 import isCI from 'is-ci';
 import { createLink, createBinaryLink } from './utils/install';
 import generateStatus from '../semver/generateStatus';
-import { getNextVersions, createVersionsDoesNotMatch } from '../semver/utils';
+import {
+  getNextVersions,
+  createVersionsDoesNotMatch,
+  getDefaultPrerelease,
+} from '../semver/utils';
 
 const removeDependenciesToBeLinked = (
   dependencies = {},
@@ -156,11 +160,12 @@ const link = async (
 
 export default projects => async ({
   arguments: { managed: { projects: selectedProjects } },
-  options: { managed: { linkAll, concurrent } },
+  options: { managed: { linkAll, concurrent, prerelease } },
   context,
 }) => {
   const binary = context.config.settings.repo.npmBinary;
   const verbose = context.verbose;
+  const prereleaseTag = getDefaultPrerelease(prerelease);
   const selected = projects.filter(
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
   );
@@ -174,7 +179,7 @@ export default projects => async ({
   const status =
     ignoreSemVer || context.config.settings.repo.mono === false
       ? {}
-      : await generateStatus(projects, true);
+      : await generateStatus(projects, true, undefined, prereleaseTag);
 
   const localDependencies = getNextVersions(status, projects);
 

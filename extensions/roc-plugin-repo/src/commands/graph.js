@@ -3,11 +3,17 @@ import generateTable from 'roc/lib/documentation/generateTable';
 import { underline, green, red } from 'chalk';
 
 import generateStatus from '../semver/generateStatus';
-import { getNextVersions, createVersionsDoesNotMatch } from '../semver/utils';
+import {
+  getNextVersions,
+  createVersionsDoesNotMatch,
+  getDefaultPrerelease,
+} from '../semver/utils';
 
 export default projects => async ({
   arguments: { managed: { projects: selectedProjects } },
+  options: { managed: { prerelease } },
 }) => {
+  const prereleaseTag = getDefaultPrerelease(prerelease);
   const selected = projects.filter(
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
   );
@@ -16,7 +22,7 @@ export default projects => async ({
     return log.warn('No projects were found');
   }
 
-  const status = await generateStatus(projects, true);
+  const status = await generateStatus(projects, true, undefined, prereleaseTag);
   const projectsWithVersions = getNextVersions(status, projects);
 
   const noLocalDependencies = [];
@@ -58,7 +64,7 @@ export default projects => async ({
         name: 'Current version',
       },
       next: {
-        name: 'Next stable version',
+        name: 'Next version',
       },
       requested: {
         name: 'Requested version',

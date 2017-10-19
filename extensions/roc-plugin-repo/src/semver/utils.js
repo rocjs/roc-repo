@@ -142,10 +142,7 @@ export function getNextVersions(status, projects) {
   const getNextVersion = project =>
     !status[project.name]
       ? project.packageJSON.version
-      : semver.inc(
-          project.packageJSON.version,
-          incrementToString(status[project.name].increment),
-        );
+      : status[project.name].newVersion;
 
   return projects.reduce(
     (dependencies, project) => ({
