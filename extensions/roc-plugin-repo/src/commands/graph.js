@@ -40,7 +40,10 @@ export default projects => async ({
       .map(dependency => ({
         current: projects.find(({ name }) => name === dependency).packageJSON
           .version,
-        development: !project.packageJSON.dependencies[dependency],
+        development: !(
+          project.packageJSON.dependencies &&
+          project.packageJSON.dependencies[dependency]
+        ),
         name: dependency,
         next: projectsWithVersions[dependency].version,
         requested: dependencies[dependency],
