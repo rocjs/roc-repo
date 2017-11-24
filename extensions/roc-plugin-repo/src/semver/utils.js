@@ -1,7 +1,7 @@
 import path from 'path';
 import conventionalChangelog from 'conventional-changelog';
 import semver from 'semver';
-import { upperCase } from 'lodash';
+import { upperCase, sortBy } from 'lodash';
 import { executeSync } from 'roc';
 
 export const versions = {
@@ -208,18 +208,54 @@ export function getMultiScopes(commit, isMonorepo) {
 
 export function getAutoScopes(commit, isMonorepo, projects) {
   if (isMonorepo && commit.scope === '*') {
-    return projects
-      .map(project => {
-        const result = executeSync(
-          `git show -s ${commit.hash} ${project.path}`,
-          { silent: true },
-        );
-        if (result.length > 0) {
-          return project.name;
+    // Get a sorted list of all file names affected by this commit
+    const affectedFiles = executeSync(
+      `git diff-tree --no-commit-id --name-only -r ${commit.hash}`,
+      { silent: true },
+    )
+      .split('\n')
+      .filter(Boolean);
+
+    if (affectedFiles.length > 0) {
+      // Create a structure for holding the project location
+      // and it's scope. By sorting it by prefix, we're able
+      // to do a single pass over the projects and files
+      const scopeMap = sortBy(
+        projects.map(p => ({
+          scope: p.name,
+          prefix: path.join(p.directory, p.folder),
+        })),
+        ['prefix'],
+      );
+
+      let remainingFiles = affectedFiles;
+      // Reduce the projects down to a list of affected scopes
+      return scopeMap.reduce((affectedScopes, { scope, prefix }) => {
+        let lastMatchingIndex = -1;
+
+        // For the still remaining files, keep track of the max
+        // index that match this scope prefix (remainingFiles is sorted
+        // alphabetically)
+        remainingFiles.every((file, ix) => {
+          const matching = file.startsWith(prefix);
+          if (matching) {
+            lastMatchingIndex = ix;
+          }
+
+          return matching;
+        });
+
+        // If we've matched at least one of the remaining files,
+        // remove all files that matched, and put this scope into
+        // the scopes affected by the commit
+        if (lastMatchingIndex >= 0) {
+          affectedScopes.push(scope);
+          remainingFiles = remainingFiles.slice(lastMatchingIndex + 1);
         }
-        return undefined;
-      })
-      .filter(r => Boolean(r));
+
+        return affectedScopes;
+      }, []);
+    }
   }
 
   return [];
