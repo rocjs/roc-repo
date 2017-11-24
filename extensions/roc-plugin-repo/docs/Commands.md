@@ -87,16 +87,17 @@ roc repo bootstrap [projects]
 
 #### Arguments
 
-| Name         | Description                                                              | Default | Type                | Required | Can be empty |
-| ------------ | ------------------------------------------------------------------------ | ------- | ------------------- | -------- | ------------ |
-| projects     | Projects to use                                                          |         | `Array(String)`     | No       | Yes          |
+| Name         | Description                                                                                            | Default | Type                | Required | Can be empty |
+| ------------ | ------------------------------------------------------------------------------------------------------ | ------- | ------------------- | -------- | ------------ |
+| projects     | Projects to use                                                                                        |         | `Array(String)`     | No       | Yes          |
 
 #### Command options
 
-| Name         | Description                                                              | Default | Type                | Required | Can be empty |
-| ------------ | ------------------------------------------------------------------------ | ------- | ------------------- | -------- | ------------ |
-| --concurrent | Run concurrently                                                         | `2`     | `Boolean / Integer` | No       |              |
-| --linkAll    | If all projects should be linked with each other, ignoring SemVer ranges | `false` | `Boolean`           | No       |              |
+| Name         | Description                                                                                            | Default | Type                | Required | Can be empty |
+| ------------ | ------------------------------------------------------------------------------------------------------ | ------- | ------------------- | -------- | ------------ |
+| --concurrent | Run concurrently                                                                                       | `2`     | `Boolean / Integer` | No       |              |
+| --linkAll    | If all projects should be linked with each other, ignoring SemVer ranges                               | `false` | `Boolean`           | No       |              |
+| --prerelease | If a prerelease should be done, and what name that should be used for the tag, will default to "alpha" | `false` | `Boolean / String`  | No       |              |
 
 ####  Settings options
 _All groups are available._
@@ -197,9 +198,15 @@ roc repo graph [projects]
 
 #### Arguments
 
-| Name     | Description     | Default | Type            | Required | Can be empty |
-| -------- | --------------- | ------- | --------------- | -------- | ------------ |
-| projects | Projects to use |         | `Array(String)` | No       | Yes          |
+| Name         | Description                                                                                            | Default | Type               | Required | Can be empty |
+| ------------ | ------------------------------------------------------------------------------------------------------ | ------- | ------------------ | -------- | ------------ |
+| projects     | Projects to use                                                                                        |         | `Array(String)`    | No       | Yes          |
+
+#### Command options
+
+| Name         | Description                                                                                            | Default | Type               | Required | Can be empty |
+| ------------ | ------------------------------------------------------------------------------------------------------ | ------- | ------------------ | -------- | ------------ |
+| --prerelease | If a prerelease should be done, and what name that should be used for the tag, will default to "alpha" | `false` | `Boolean / String` | No       |              |
 
 ####  Defined by extensions
 roc-plugin-repo

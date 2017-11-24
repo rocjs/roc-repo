@@ -1,3 +1,16 @@
+<a name="0.0.26"></a>
+## 0.0.26 (2017-11-24)
+
+
+### Bug Fixes
+
+* Added --prerelease option to graph and bootstrap ([c723884](https://github.com/rocjs/roc-repo/commit/c723884))
+* Ensure safe ignore-pattern ([d087a78](https://github.com/rocjs/roc-repo/commit/d087a78))
+* Fix problem when projects don't have dependencies ([8f62726](https://github.com/rocjs/roc-repo/commit/8f62726))
+* Lock version of prettier to not get format changes ([f293467](https://github.com/rocjs/roc-repo/commit/f293467))
+
+
+
 <a name="0.0.25"></a>
 ## 0.0.25 (2017-10-03)
 
