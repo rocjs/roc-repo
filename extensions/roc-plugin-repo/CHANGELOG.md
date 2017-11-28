@@ -1,3 +1,13 @@
+<a name="0.0.27"></a>
+## 0.0.27 (2017-11-28)
+
+
+### Performance Improvements
+
+* Reduce calls to `executeSync` in `getAutoScopes` ([8516455](https://github.com/rocjs/roc-repo/commit/8516455))
+
+
+
 <a name="0.0.26"></a>
 ## 0.0.26 (2017-11-24)
 
