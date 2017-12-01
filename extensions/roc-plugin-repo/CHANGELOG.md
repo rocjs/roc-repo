@@ -1,3 +1,13 @@
+<a name="0.0.28"></a>
+## 0.0.28 (2017-12-01)
+
+
+### Bug Fixes
+
+* Make sure we are working with a non shallow repo ([21997dd](https://github.com/rocjs/roc-repo/commit/21997dd))
+
+
+
 <a name="0.0.27"></a>
 ## 0.0.27 (2017-11-28)
 
