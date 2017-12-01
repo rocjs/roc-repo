@@ -1,7 +1,11 @@
+import { existsSync } from 'fs';
+
 import conventionalChangelog from 'conventional-changelog';
 import conventionalCommitsFilter from 'conventional-commits-filter';
+import execa from 'execa';
 import semver from 'semver';
 import { upperCase } from 'lodash';
+import log from 'roc/log/default/small';
 
 import {
   isBreakingChange,
@@ -33,6 +37,15 @@ export default async function generateStatus(
       currentPrerelease: undefined,
     };
   });
+
+  // Make sure we have all of the commits to be able to generate the right status
+  // if we are working with a shallow clone of the repository
+  if (existsSync('.git/shallow')) {
+    log.info(
+      'The git repository is shallow and will be unshallowed to work correctly.',
+    );
+    await execa('git', ['fetch', '--unshallow', '--tags'], { reject: false });
+  }
 
   const latest = await getLatestCommitsSinceRelease(
     'angular',
