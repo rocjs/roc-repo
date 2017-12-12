@@ -297,6 +297,45 @@ module.exports.roc = {
           },
         },
       },
+      import: {
+        command: args => fetchProjects(lazyRequire('./commands/import'))(args),
+        arguments: {
+          repository: {
+            validator: validators.required(
+              validators.notEmpty(validators.isString),
+            ),
+            description: 'Repository to import from',
+          },
+          location: {
+            validator: validators.isString,
+            description: 'Where to expand the repository',
+          },
+        },
+        options: {
+          merge: {
+            validator: validators.isBoolean,
+            description:
+              'If a merge strategy should be used when importing a repository',
+            default: false,
+          },
+          prefix: {
+            validator: validators.isBoolean,
+            description:
+              'If commits should be prefixed with the project name for each commit, ignored when using merge',
+            default: false,
+          },
+          flatten: {
+            validator: validators.isBoolean,
+            default: false,
+            description:
+              'Import each merge commit as a single change the merge introduced, ignored when using merge',
+          },
+          subdirectory: {
+            validator: validators.isString,
+            description: 'Import only a given subdirectory from the repository',
+          },
+        },
+      },
       lint: {
         command: args => fetchProjects(lazyRequire('./commands/lint'))(args),
         description: 'Runs lint',
