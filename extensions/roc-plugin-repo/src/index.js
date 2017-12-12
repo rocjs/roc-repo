@@ -504,17 +504,6 @@ module.exports.roc = {
         },
         options: jestOptions,
       },
-      unlink: {
-        command: args => fetchProjects(lazyRequire('./commands/unlink'))(args),
-        description: 'Unlinks the projects',
-        settings: true,
-        arguments: {
-          projects: {
-            validator: validators.isArray(validators.isString),
-            description: 'Projects to use',
-          },
-        },
-      },
     },
   },
 };
