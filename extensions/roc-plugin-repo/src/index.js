@@ -5,6 +5,7 @@ import readPkg from 'read-pkg';
 import { lazyFunctionRequire, generateDependencies } from 'roc';
 import glob from 'glob';
 import { yellow } from 'chalk';
+import resolveFrom from 'resolve-from';
 
 import { invokeHook, packageJSON } from './util';
 import { config, meta } from './config';
@@ -41,7 +42,10 @@ function fetchProjects(command) {
   return command(invokeHook('get-projects'));
 }
 
-const jestOptions = require('jest-cli/build/cli/args').options;
+const jestOptions = require(resolveFrom(
+  require.resolve('jest'),
+  'jest-cli/build/cli/args',
+)).options;
 
 Object.keys(jestOptions).forEach(key => {
   if (jestOptions[key].type === 'boolean') {
@@ -60,6 +64,9 @@ Object.keys(jestOptions).forEach(key => {
 module.exports.roc = {
   dependencies: {
     uses: generateDependencies(packageJSON, ['babel-preset-env']),
+    requires: {
+      jest: '^21.2.1 || ^22.0.0',
+    },
   },
   plugins: [require.resolve('roc-plugin-babel')],
   hooks: {

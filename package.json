@@ -7,6 +7,7 @@
     "test": "roc lint && roc test && roc build"
   },
   "devDependencies": {
+    "jest": "^22.1.1",
     "roc-plugin-repo": "*",
     "roc-plugin-repo-roc": "*",
     "roc": "^1.0.0-rc.20"
