@@ -15,7 +15,6 @@ export const config = {
       // This makes the plugin work with existing roc repos as well as the default
       // convention for most monorepos
       mono: ['packages', 'extensions'],
-      targets: ['cjs', 'esm'],
       input: 'src',
       output: 'lib',
       test: ['**/__tests__/**/*.js?(x)', '**/(*.)(spec|test).js?(x)'],
@@ -42,10 +41,6 @@ export const meta = {
 
           return input === false;
         }),
-      },
-      targets: {
-        description: 'The possible build targets.',
-        validator: isArray(/cjs|esm/),
       },
       input: {
         description: 'Location of the code that should run through Babel.',
