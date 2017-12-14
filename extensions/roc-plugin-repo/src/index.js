@@ -31,6 +31,7 @@ function getProjects(baseDirectory, directory) {
           path,
           name: pkgJSON.name,
           packageJSON: pkgJSON,
+          rawPackageJSON: require(`${path}/package.json`),
         };
       }
       return undefined;
@@ -70,6 +71,31 @@ module.exports.roc = {
   },
   plugins: [require.resolve('roc-plugin-babel')],
   hooks: {
+    'run-script': {
+      description:
+        'Invoked for build, clean, lint, release and test making it possible to customize what is done and extend existing functionality, the functions can return a promise.',
+      hasCallback: true,
+      returns: validators.oneOf(
+        validators.isFunction,
+        validators.isArray(validators.isFunction),
+      ),
+      arguments: {
+        script: {
+          validator: validators.isString,
+          description:
+            'The script that has been invoked, can be either `build`, `clean`, `lint`, `release` or `test`.',
+        },
+        projects: {
+          validator: validators.isArray(validators.isObject()),
+          description: 'The projects that the script has been invoked for.',
+        },
+        extra: {
+          description:
+            'Additional arguments containing `options`, `extraArguments` from the command as well as `createLogger` that takes a name and returns a function that can be used for logging',
+          validator: validators.isObject(),
+        },
+      },
+    },
     'get-projects': {
       description: 'Gets all projects.',
       returns: validators.isArray(validators.isObject()),
@@ -114,6 +140,10 @@ module.exports.roc = {
   },
   actions: [
     {
+      hook: 'run-script',
+      action: lazyRequire('./actions/runScript'),
+    },
+    {
       hook: 'get-projects',
       action: ({
         context: { directory, config: { settings } },
@@ -127,6 +157,7 @@ module.exports.roc = {
                 path: directory,
                 name: pkgJSON.name,
                 packageJSON: pkgJSON,
+                rawPackageJSON: require(`${directory}/package.json`),
               },
             ];
           }
@@ -226,6 +257,14 @@ module.exports.roc = {
           },
         },
         options: {
+          concurrent: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isInteger,
+            ),
+            description: 'Run concurrently',
+            default: 2,
+          },
           watch: {
             validator: validators.isBoolean,
             description: 'Enabled watch mode',
@@ -241,6 +280,16 @@ module.exports.roc = {
           projects: {
             validator: validators.isArray(validators.isString),
             description: 'Projects to use',
+          },
+        },
+        options: {
+          concurrent: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isInteger,
+            ),
+            description: 'Run concurrently',
+            default: false,
           },
         },
       },
@@ -347,6 +396,14 @@ module.exports.roc = {
           },
         },
         options: {
+          concurrent: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isInteger,
+            ),
+            description: 'Run concurrently',
+            default: false,
+          },
           fix: {
             validator: validators.isBoolean,
             description: 'Use ESLint --fix option',

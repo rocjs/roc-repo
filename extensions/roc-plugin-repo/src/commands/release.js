@@ -12,6 +12,7 @@ import generateStatus from '../semver/generateStatus';
 import { invokeHook } from '../util';
 import createGitHubRelease from './utils/createGitHubRelease';
 import getTag from './utils/getTag';
+import scriptRunner from './utils/scriptRunner';
 
 export default projects => ({
   arguments: { managed: { projects: selectedProjects } },
@@ -458,25 +459,16 @@ export default projects => ({
             ]),
         },
         {
-          title: 'Publishing to npm',
+          title: 'Publishing',
           skip: () => !git || !publish,
           task: () =>
             new Listr(
               selectedToBeReleased.map(project => ({
                 title: `${project.name}@${status[project.name].newVersion}`,
-                task: () => {
-                  let registry = '';
-                  const publishConfig = project.packageJSON.publishConfig;
-                  if (publishConfig && publishConfig.registry) {
-                    registry = `--registry='${publishConfig.registry}'`;
-                  }
-
-                  const publishCommand = `npm publish ${registry} --tag ${distTag}`;
-
-                  return execa.shell(publishCommand, {
-                    cwd: project.path,
-                  });
-                },
+                task: () =>
+                  scriptRunner('publish')([project], settings, false, {
+                    distTag,
+                  }),
               })),
             ),
         },

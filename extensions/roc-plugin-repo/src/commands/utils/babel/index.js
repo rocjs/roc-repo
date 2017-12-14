@@ -2,21 +2,19 @@
  Parts of the code taken from babel-cli
 */
 
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 
 import { uniq, each } from 'lodash';
 import glob from 'glob';
-import outputFileSync from 'output-file-sync';
+
 import pathExists from 'path-exists';
 import readdir from 'fs-readdir-recursive';
 import slash from 'slash';
-import log from 'roc/log/default';
-import { bold } from 'chalk';
 
 import * as util from './utils';
 
-export default function babelBuilder(cliOptions, babelOptions) {
+export default async function babelBuilder(cliOptions, babelOptions) {
   let filenames = [cliOptions.src].reduce((globbed, input) => {
     let files = glob.sync(input);
     if (!files.length) files = [input];
@@ -26,7 +24,7 @@ export default function babelBuilder(cliOptions, babelOptions) {
 
   filenames = uniq(filenames);
 
-  filenames.forEach(filename => handle(cliOptions.identifier, filename));
+  await Promise.all(filenames.map(filename => handle(filename)));
 
   if (cliOptions.watch) {
     const chokidar = require('chokidar'); // eslint-disable-line global-require
@@ -41,7 +39,7 @@ export default function babelBuilder(cliOptions, babelOptions) {
         watcher.on(type, filename => {
           const relative = path.relative(dirname, filename) || filename;
           try {
-            handleFile(cliOptions.identifier, filename, relative);
+            handleFile(filename, relative);
           } catch (err) {
             console.error(err.stack); // eslint-disable-line no-console
           }
@@ -50,14 +48,14 @@ export default function babelBuilder(cliOptions, babelOptions) {
     });
   }
 
-  function write(identifier, src, relative) {
+  async function write(src, relative) {
     // remove extension and then append back on .js
     relative = `${relative.replace(/\.(\w*?)$/, '')}.js`; // eslint-disable-line no-param-reassign
 
     const dest = path.join(cliOptions.out, relative);
 
-    const data = util.compile(
-      identifier,
+    const data = await util.compile(
+      cliOptions.log,
       src,
       {
         sourceMaps: cliOptions.sourceMaps,
@@ -78,45 +76,47 @@ export default function babelBuilder(cliOptions, babelOptions) {
     ) {
       const mapLoc = `${dest}.map`;
       data.code = util.addSourceMappingUrl(data.code, mapLoc);
-      outputFileSync(mapLoc, JSON.stringify(data.map));
+      await fs.outputFile(mapLoc, JSON.stringify(data.map));
     }
 
-    outputFileSync(dest, data.code);
-    util.chmod(src, dest);
+    await fs.outputFile(dest, data.code);
+    await util.chmod(src, dest);
 
-    log.small.log(
-      `${bold(identifier)}(${cliOptions.mode}): ${src.slice(
+    cliOptions.log(
+      `${src.slice(cliOptions.path.length + 1)} -> ${dest.slice(
         cliOptions.path.length + 1,
-      )} -> ${dest.slice(cliOptions.path.length + 1)}`,
+      )}`,
     );
   }
 
-  function handleFile(identifier, src, filename) {
+  async function handleFile(src, filename) {
     if (util.shouldIgnore(src, cliOptions.ignore)) return;
 
     if (util.canCompile(filename, ['.js', '.jsx', '.es6', '.es'])) {
-      write(identifier, src, filename);
+      await write(src, filename);
     } else if (cliOptions.copyFiles) {
       const dest = path.join(cliOptions.out, filename);
-      outputFileSync(dest, fs.readFileSync(src));
-      util.chmod(src, dest);
+      await fs.copy(src, dest);
+      await util.chmod(src, dest);
     }
   }
 
-  function handle(identifier, filename) {
+  async function handle(filename) {
     if (!pathExists.sync(filename)) return;
 
-    const stat = fs.statSync(filename);
+    const stat = await fs.stat(filename);
 
     if (stat.isDirectory(filename)) {
       const dirname = filename;
 
-      each(readdir(dirname), currentFilename => {
-        const src = path.join(dirname, currentFilename);
-        handleFile(identifier, src, currentFilename);
-      });
+      await Promise.all(
+        readdir(dirname).map(currentFilename => {
+          const src = path.join(dirname, currentFilename);
+          return handleFile(src, currentFilename);
+        }),
+      );
     } else {
-      write(identifier, filename, filename);
+      await write(filename, filename);
     }
   }
 }

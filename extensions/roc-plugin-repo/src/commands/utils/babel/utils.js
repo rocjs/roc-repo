@@ -2,14 +2,13 @@
  Parts of the code taken from babel-cli
 */
 
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 
 import { transform as transformCore, util } from 'babel-core';
-import log from 'roc/log/default/large';
 
 export function chmod(src, dest) {
-  fs.chmodSync(dest, fs.statSync(src).mode);
+  return fs.chmod(dest, fs.statSync(src).mode);
 }
 
 export const canCompile = util.canCompile;
@@ -33,13 +32,14 @@ export function transform(filename, code, opts) {
   return result;
 }
 
-export function compile(identifier, filename, opts, watch = false) {
+export async function compile(log, filename, opts, watch = false) {
   try {
-    const code = fs.readFileSync(filename, 'utf8');
+    const code = await fs.readFile(filename, 'utf8');
     return transform(filename, code, opts);
   } catch (err) {
     if (watch) {
-      log.warn(identifier, 'Build Error', toErrorStack(err));
+      // Leaving the message intentionally blank here
+      log('', toErrorStack(err));
       return { ignored: true };
     }
 
