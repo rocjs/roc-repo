@@ -8,6 +8,7 @@ module.exports = {
       },
       release: {
         collectedRelease: false,
+        includeBody: true,
       },
     },
   },
