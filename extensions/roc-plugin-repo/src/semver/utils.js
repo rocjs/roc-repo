@@ -204,7 +204,10 @@ export function getMultiScopes(commit, isMonorepo) {
 }
 
 export function getAutoScopes(commit, isMonorepo, projects) {
-  if (isMonorepo && commit.scope === '*') {
+  if (
+    isMonorepo &&
+    (commit.scope === '*' || upperCase(commit.scope) === 'AUTO')
+  ) {
     // Get a sorted list of all file names affected by this commit
     const affectedFiles = executeSync(
       `git diff-tree --no-commit-id --name-only -r ${commit.hash}`,
