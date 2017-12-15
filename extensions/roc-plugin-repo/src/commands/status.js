@@ -1,4 +1,5 @@
 import log from 'roc/log/default';
+import compareFunc from 'compare-func';
 
 import generateStatus from '../semver/generateStatus';
 
@@ -16,6 +17,7 @@ const report = (status, isMonorepo, prerelease) => {
 
   return projects.forEach(project => {
     const changes = status[project].commits
+      .sort(compareFunc('type'))
       .map(
         commit =>
           `  — ${isMonorepo
