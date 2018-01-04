@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { execute } from 'roc';
+import execa from 'execa';
 import log from 'roc/log/default/small';
 import onExit from 'signal-exit';
 import readPkg from 'read-pkg';
@@ -57,7 +57,7 @@ const install = async (
   project,
   binary,
   localDependencies,
-  { ignoreSemVer, verbose },
+  { ignoreSemVer },
 ) => {
   const pathToPackageJSON = path.join(project.path, 'package.json');
   const pathToPackageJSONBackup = `${pathToPackageJSON}.backup`;
@@ -84,8 +84,8 @@ const install = async (
 
   const unregister = onExit(restorePackageJSON);
 
-  return execute(`cd ${project.path} && ${binary} install`, {
-    silent: !verbose,
+  return execa(binary, ['install'], {
+    cwd: project.path,
   }).then(
     () => {
       restorePackageJSON();
@@ -164,7 +164,6 @@ export default projects => async ({
   context,
 }) => {
   const binary = context.config.settings.repo.npmBinary;
-  const verbose = context.verbose;
   const prereleaseTag = getDefaultPrerelease(prerelease);
   const selected = projects.filter(
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
@@ -194,7 +193,6 @@ export default projects => async ({
               task: () =>
                 install(project, binary, localDependencies, {
                   ignoreSemVer,
-                  verbose,
                 }),
             })),
             { concurrent },

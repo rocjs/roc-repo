@@ -1,4 +1,4 @@
-import { execute } from 'roc';
+import execa from 'execa';
 import log from 'roc/log/default/small';
 import Listr from 'listr';
 import isCI from 'is-ci';
@@ -26,8 +26,8 @@ export default projects => ({
     selected.map(project => ({
       title: `Running "${command}" in ${project.name}`,
       task: () =>
-        execute(command, {
-          silent,
+        execa.shell(command, {
+          stdout: silent ? undefined : 'inherit',
           cwd: project.path,
         }),
     })),

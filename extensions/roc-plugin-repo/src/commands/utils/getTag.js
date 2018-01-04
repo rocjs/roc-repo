@@ -1,13 +1,12 @@
 import dateFormat from 'dateformat';
 import projectNameGenerator from 'project-name-generator';
-
-import execute from './execute';
+import execa from 'execa';
 
 export default async function getTag(tagTemplate) {
-  const { stdout: tagsOutput } = await execute('git fetch && git tag -l');
+  const { stdout: tagsOutput } = await execa.shell('git fetch && git tag -l');
   const existingTags = tagsOutput.trim().split('\n');
 
-  const { stdout: hashOutput } = await execute('git rev-parse HEAD');
+  const { stdout: hashOutput } = await execa.shell('git rev-parse HEAD');
   const hash = hashOutput.trim();
 
   const generateTag = (tries = 0) => {

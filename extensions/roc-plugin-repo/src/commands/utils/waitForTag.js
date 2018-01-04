@@ -1,4 +1,5 @@
-import exec from './execute';
+import execa from 'execa';
+
 import wait from './wait';
 
 export default async function waitForTag({
@@ -9,7 +10,7 @@ export default async function waitForTag({
   tries,
   delay,
 }) {
-  const { stdout } = await exec(`git show-ref -s ${tag}`);
+  const { stdout } = await execa('git', ['show-ref', '-s', tag]);
   const hash = stdout.trim();
 
   const checkTag = async triesLeft => {

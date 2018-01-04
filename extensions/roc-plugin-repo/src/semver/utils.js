@@ -2,7 +2,7 @@ import path from 'path';
 import conventionalChangelog from 'conventional-changelog';
 import semver from 'semver';
 import { upperCase, sortBy } from 'lodash';
-import { executeSync } from 'roc';
+import execa from 'execa';
 
 import conventionalChangelogRoc from './conventional-changelog-roc';
 
@@ -209,11 +209,9 @@ export function getAutoScopes(commit, isMonorepo, projects) {
     (commit.scope === '*' || upperCase(commit.scope) === 'AUTO')
   ) {
     // Get a sorted list of all file names affected by this commit
-    const affectedFiles = executeSync(
-      `git diff-tree --no-commit-id --name-only -r ${commit.hash}`,
-      { silent: true },
-    )
-      .split('\n')
+    const affectedFiles = execa
+      .shellSync(`git diff-tree --no-commit-id --name-only -r ${commit.hash}`)
+      .stdout.split('\n')
       .filter(Boolean);
 
     if (affectedFiles.length > 0) {

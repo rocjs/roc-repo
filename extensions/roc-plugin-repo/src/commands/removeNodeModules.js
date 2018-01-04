@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { execute } from 'roc';
+import execa from 'execa';
 import log from 'roc/log/default/small';
 import Listr from 'listr';
 import isCI from 'is-ci';
@@ -24,7 +24,7 @@ export default projects => ({
   return new Listr(
     selected.map(project => ({
       title: `Removing node_modules for ${project.name}`,
-      task: () => execute(remove(project)),
+      task: () => execa.shell(remove(project)),
     })),
     { renderer: isCI ? 'verbose' : 'default' },
   ).run();

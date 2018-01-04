@@ -402,11 +402,10 @@ export default projects => ({
                             },
                           )
                           .then(async () => {
-                            const {
-                              stdout,
-                            } = await require('./utils/execute').default(
-                              'git rev-parse HEAD',
-                            );
+                            const { stdout } = await execa('git', [
+                              'rev-parse',
+                              'HEAD',
+                            ]);
                             const hash = stdout.trim();
                             // eslint-disable-next-line no-param-reassign
                             project.releaseCommitHash = hash;

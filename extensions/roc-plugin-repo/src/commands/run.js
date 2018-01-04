@@ -1,4 +1,4 @@
-import { execute } from 'roc';
+import execa from 'execa';
 import log from 'roc/log/default/small';
 import Listr from 'listr';
 import isCI from 'is-ci';
@@ -11,7 +11,7 @@ export default projects => ({
   context,
   arguments: { managed: { command, projects: selectedProjects } },
   options: { managed: { list, concurrent } },
-  extraArguments,
+  extraArguments = [],
 }) => {
   const binary = context.config.settings.repo.npmBinary;
 
@@ -72,8 +72,7 @@ export default projects => ({
     toRun.map(project => ({
       title: `Running "${command}" using ${binary} in ${project.name}`,
       task: () =>
-        execute(`${binary} run ${command}`, {
-          args: extraArguments,
+        execa(binary, ['run', command].concat(extraArguments), {
           cwd: project.path,
         }),
     })),
