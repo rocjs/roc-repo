@@ -77,7 +77,7 @@ export default function scriptRunner(script) {
           });
 
           // TODO Should we pass in the arguments here, like watch?
-          console.log(`${tag} Using custom script for ${script}`);
+          log.small.log(`${tag} Using custom script for ${script}`);
           const child = execa(settings.npmBinary, ['run', script], {
             cwd: project.path,
           });
