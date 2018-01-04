@@ -4,7 +4,7 @@ import log from 'roc/log/default/small';
 import readPkg from 'read-pkg';
 import { lazyFunctionRequire, generateDependencies } from 'roc';
 import glob from 'glob';
-import { yellow } from 'chalk';
+import chalk from 'chalk';
 import resolveFrom from 'resolve-from';
 
 import { invokeHook, packageJSON } from './util';
@@ -429,9 +429,11 @@ module.exports.roc = {
               `Found the following:\n${projects
                 .map(
                   project =>
-                    ` — ${project.name} (${project.packageJSON
+                    ` — ${chalk.bold(project.name)} (${project.packageJSON
                       .version})${project.packageJSON.private
-                      ? ` ${yellow('Private')}`
+                      ? ` ${chalk.yellow('Private')}`
+                      : ''} ${project.directory
+                      ? chalk.dim(`${project.directory}/${project.folder}`)
                       : ''}`,
                 )
                 .join('\n')}`,
