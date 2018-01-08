@@ -1,7 +1,7 @@
 import path from 'path';
 import conventionalChangelog from 'conventional-changelog';
 import semver from 'semver';
-import { upperCase, sortBy } from 'lodash';
+import { upperCase } from 'lodash';
 import execa from 'execa';
 
 import conventionalChangelogRoc from './conventional-changelog-roc';
@@ -209,7 +209,7 @@ export function getAutoScopes(commit, isMonorepo, projects) {
     (commit.scope === '*' || upperCase(commit.scope) === 'AUTO')
   ) {
     // Get a sorted list of all file names affected by this commit
-    const affectedFiles = execa
+    let affectedFiles = execa
       .shellSync(`git diff-tree --no-commit-id --name-only -r ${commit.hash}`)
       .stdout.split('\n')
       .filter(Boolean);
@@ -218,38 +218,29 @@ export function getAutoScopes(commit, isMonorepo, projects) {
       // Create a structure for holding the project location
       // and it's scope. By sorting it by prefix, we're able
       // to do a single pass over the projects and files
-      const scopeMap = sortBy(
-        projects.map(p => ({
-          scope: p.name,
-          prefix: path.join(p.directory, p.folder),
-        })),
-        ['prefix'],
-      );
+      const scopeMap = projects.map(p => ({
+        scope: p.name,
+        prefix: path.join(p.directory, p.folder),
+      }));
 
-      let remainingFiles = affectedFiles;
+      const remainingFiles = affectedFiles;
       // Reduce the projects down to a list of affected scopes
       return scopeMap.reduce((affectedScopes, { scope, prefix }) => {
-        let lastMatchingIndex = -1;
+        // Remove all files that matches the current scope
+        const updatedAffectedFiles = remainingFiles.filter(
+          file => !file.startsWith(prefix),
+        );
 
-        // For the still remaining files, keep track of the max
-        // index that match this scope prefix (remainingFiles is sorted
-        // alphabetically)
-        remainingFiles.every((file, ix) => {
-          const matching = file.startsWith(prefix);
-          if (matching) {
-            lastMatchingIndex = ix;
-          }
-
-          return matching;
-        });
-
-        // If we've matched at least one of the remaining files,
-        // remove all files that matched, and put this scope into
-        // the scopes affected by the commit
-        if (lastMatchingIndex >= 0) {
+        // If we removed some files from affectedFiles we know that the current scope
+        // was a match and therefore the scope was affected by the commit
+        if (updatedAffectedFiles.length !== remainingFiles.length) {
           affectedScopes.push(scope);
-          remainingFiles = remainingFiles.slice(lastMatchingIndex + 1);
+          affectedFiles = updatedAffectedFiles;
         }
+
+        // TODO If affectedFiles is not empty after all scopes we know that the commit
+        // has modified things outside the projects and we could use this information to display
+        // a warning perhaps?
 
         return affectedScopes;
       }, []);
