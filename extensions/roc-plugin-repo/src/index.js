@@ -604,6 +604,27 @@ module.exports.roc = {
         },
         options: jestOptions,
       },
+      watch: {
+        command: args => fetchProjects(lazyRequire('./commands/watch'))(args),
+        description: 'Build projects in watch mode',
+        settings: true,
+        arguments: {
+          projects: {
+            validator: validators.isArray(validators.isString),
+            description: 'Projects to use',
+          },
+        },
+        options: {
+          concurrent: {
+            validator: validators.oneOf(
+              validators.isBoolean,
+              validators.isInteger,
+            ),
+            description: 'Run concurrently',
+            default: 2,
+          },
+        },
+      },
     },
   },
 };

@@ -13,6 +13,13 @@ export default ({ context }) => (script, projects, extra) => () => {
     return lazyRequire('./publish')(context, projects, extra);
   } else if (script === 'test') {
     return lazyRequire('./test')(context, projects, extra);
+  } else if (script === 'watch') {
+    return lazyRequire('./build')(context, projects, {
+      ...extra,
+      options: {
+        watch: true,
+      },
+    });
   }
 
   return [];
