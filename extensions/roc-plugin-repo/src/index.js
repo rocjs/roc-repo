@@ -310,11 +310,6 @@ module.exports.roc = {
           },
         },
         options: {
-          silent: {
-            validator: validators.isBoolean,
-            description: 'Silent output',
-            default: true,
-          },
           concurrent: {
             validator: validators.oneOf(
               validators.isBoolean,

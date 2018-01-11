@@ -1,11 +1,11 @@
-import execa from 'execa';
 import log from 'roc/log/default/small';
-import Listr from 'listr';
-import isCI from 'is-ci';
+
+import run from './utils/run';
 
 export default projects => ({
+  context,
   arguments: { managed: { projects: selectedProjects } },
-  options: { managed: { silent, concurrent } },
+  options: { managed: { concurrent } },
   extraArguments,
 }) => {
   const selected = projects.filter(
@@ -22,15 +22,9 @@ export default projects => ({
     return log.warn('No command was given');
   }
 
-  return new Listr(
-    selected.map(project => ({
-      title: `Running "${command}" in ${project.name}`,
-      task: () =>
-        execa.shell(command, {
-          stdout: silent ? undefined : 'inherit',
-          cwd: project.path,
-        }),
-    })),
-    { concurrent, renderer: isCI ? 'verbose' : 'default' },
-  ).run();
+  return run(selected, {
+    command,
+    concurrent,
+    isMonorepo: !!context.config.settings.repo.mono,
+  })();
 };

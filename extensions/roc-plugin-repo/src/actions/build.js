@@ -7,39 +7,41 @@ function buildWithBabel(config, watch, createLogger) {
   return (projects, mode, multipleTargets) =>
     Promise.all(
       projects.map(project => {
-        const logger = createLogger(project.name).logger;
+        const logger = createLogger(`${project.name} (${mode})`).logger;
         const babelConfig = invokeHook('babel-config', mode, project);
-        try {
-          logger(`Building for ${mode} with Babel`);
-          return babel(
-            {
-              mode,
-              path: project.path,
-              src: `${project.path}/${settings.input}`,
-              out: multipleTargets
-                ? `${project.path}/${settings.output}/${mode}`
-                : `${project.path}/${settings.output}`,
-              // We want to ignore potential __snapshots__ and __mocks__ directories
-              ignore: settings.test.concat([
-                '**/__snapshots__/**',
-                '**/__mocks__/**',
-              ]),
-              copyFiles: true,
-              sourceMaps: true,
-              babelrc: false,
-              watch,
-              log: logger,
-            },
-            babelConfig,
-          );
-        } catch (err) {
-          err.projectName = project.name;
+        logger(
+          `Building for ${mode === 'cjs'
+            ? 'CommonJS'
+            : 'ES Modules'} with Babel`,
+        );
+        return babel(
+          {
+            mode,
+            path: project.path,
+            src: `${project.path}/${settings.input}`,
+            out: multipleTargets
+              ? `${project.path}/${settings.output}/${mode}`
+              : `${project.path}/${settings.output}`,
+            // We want to ignore potential __snapshots__ and __mocks__ directories
+            ignore: settings.test.concat([
+              '**/__snapshots__/**',
+              '**/__mocks__/**',
+            ]),
+            copyFiles: true,
+            sourceMaps: true,
+            babelrc: false,
+            watch,
+            log: logger,
+          },
+          babelConfig,
+        ).catch(err => {
+          err.projectName = project.name; // eslint-disable-line no-param-reassign
           if (err._babel && err instanceof SyntaxError) {
             // Display codeFrame if it is an Babel Error
-            err.message = `${err.message}\n${err.codeFrame}`;
+            err.message = `${err.message}\n${err.codeFrame}`; // eslint-disable-line no-param-reassign
           }
           throw err;
-        }
+        });
       }),
     );
 }
@@ -69,5 +71,14 @@ export default (context, projects, { options: { watch }, createLogger }) => {
         cjsJavaScriptBuild.length > 0,
       );
     }
+
+    if (
+      watch &&
+      (esmJavaScriptBuild.length > 0 || cjsJavaScriptBuild.length > 0)
+    ) {
+      return { watch: true };
+    }
+
+    return undefined;
   };
 };

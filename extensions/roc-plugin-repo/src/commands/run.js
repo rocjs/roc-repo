@@ -1,7 +1,6 @@
-import execa from 'execa';
 import log from 'roc/log/default/small';
-import Listr from 'listr';
-import isCI from 'is-ci';
+
+import run from './utils/run';
 
 function makeList(elements) {
   return `${elements.map(element => ` - ${element}`).join('\n')}\n`;
@@ -68,14 +67,10 @@ export default projects => ({
     return log.warn('Nothing matched the selected script');
   }
 
-  return new Listr(
-    toRun.map(project => ({
-      title: `Running "${command}" using ${binary} in ${project.name}`,
-      task: () =>
-        execa(binary, ['run', command].concat(extraArguments), {
-          cwd: project.path,
-        }),
-    })),
-    { concurrent, renderer: isCI ? 'verbose' : 'default' },
-  ).run();
+  return run(toRun, {
+    binary,
+    command: ['run', command].concat(extraArguments),
+    concurrent,
+    isMonorepo: !!context.config.settings.repo.mono,
+  })();
 };
