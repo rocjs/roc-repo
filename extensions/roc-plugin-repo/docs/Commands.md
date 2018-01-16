@@ -25,6 +25,7 @@ All commands can be called with some additional options illustrated in the table
     * [commit](#commit)
     * [exec](#exec)
     * [graph](#graph)
+    * [import](#import)
     * [lint](#lint)
     * [list](#list)
     * [release](#release)
@@ -32,7 +33,7 @@ All commands can be called with some additional options illustrated in the table
     * [run](#run)
     * [status](#status)
     * [test](#test)
-    * [unlink](#unlink)
+    * [watch](#watch)
 
 ## meta
 __Meta commands__
@@ -115,15 +116,16 @@ roc repo build [projects]
 
 #### Arguments
 
-| Name        | Description        | Default | Type            | Required | Can be empty |
-| ----------- | ------------------ | ------- | --------------- | -------- | ------------ |
-| projects    | Projects to use    |         | `Array(String)` | No       | Yes          |
+| Name         | Description        | Default | Type                | Required | Can be empty |
+| ------------ | ------------------ | ------- | ------------------- | -------- | ------------ |
+| projects     | Projects to use    |         | `Array(String)`     | No       | Yes          |
 
 #### Command options
 
-| Name        | Description        | Default | Type            | Required | Can be empty |
-| ----------- | ------------------ | ------- | --------------- | -------- | ------------ |
-| -w, --watch | Enabled watch mode |         | `Boolean`       | No       |              |
+| Name         | Description        | Default | Type                | Required | Can be empty |
+| ------------ | ------------------ | ------- | ------------------- | -------- | ------------ |
+| --concurrent | Run concurrently   | `2`     | `Boolean / Integer` | No       |              |
+| -w, --watch  | Enabled watch mode |         | `Boolean`           | No       |              |
 
 ####  Settings options
 _All groups are available._
@@ -141,9 +143,15 @@ roc repo clean [projects]
 
 #### Arguments
 
-| Name     | Description     | Default | Type            | Required | Can be empty |
-| -------- | --------------- | ------- | --------------- | -------- | ------------ |
-| projects | Projects to use |         | `Array(String)` | No       | Yes          |
+| Name         | Description      | Default | Type                | Required | Can be empty |
+| ------------ | ---------------- | ------- | ------------------- | -------- | ------------ |
+| projects     | Projects to use  |         | `Array(String)`     | No       | Yes          |
+
+#### Command options
+
+| Name         | Description      | Default | Type                | Required | Can be empty |
+| ------------ | ---------------- | ------- | ------------------- | -------- | ------------ |
+| --concurrent | Run concurrently | `false` | `Boolean / Integer` | No       |              |
 
 ####  Settings options
 _All groups are available._
@@ -184,7 +192,6 @@ roc repo exec [projects]
 | Name         | Description      | Default | Type                | Required | Can be empty |
 | ------------ | ---------------- | ------- | ------------------- | -------- | ------------ |
 | --concurrent | Run concurrently | `false` | `Boolean / Integer` | No       |              |
-| --silent     | Silent output    | `true`  | `Boolean`           | No       |              |
 
 ####  Defined by extensions
 roc-plugin-repo
@@ -211,6 +218,31 @@ roc repo graph [projects]
 ####  Defined by extensions
 roc-plugin-repo
 
+### import
+
+```
+roc repo import <repository> [location]
+```
+
+#### Arguments
+
+| Name           | Description                                                                                   | Default | Type      | Required | Can be empty |
+| -------------- | --------------------------------------------------------------------------------------------- | ------- | --------- | -------- | ------------ |
+| repository     | Repository to import from                                                                     |         | `String`  | Yes      | No           |
+| location       | Where to expand the repository                                                                |         | `String`  | No       | Yes          |
+
+#### Command options
+
+| Name           | Description                                                                                   | Default | Type      | Required | Can be empty |
+| -------------- | --------------------------------------------------------------------------------------------- | ------- | --------- | -------- | ------------ |
+| --flatten      | Import each merge commit as a single change the merge introduced, ignored when using merge    | `false` | `Boolean` | No       |              |
+| --merge        | If a merge strategy should be used when importing a repository                                | `false` | `Boolean` | No       |              |
+| --prefix       | If commits should be prefixed with the project name for each commit, ignored when using merge | `false` | `Boolean` | No       |              |
+| --subdirectory | Import only a given subdirectory from the repository                                          |         | `String`  | No       | Yes          |
+
+####  Defined by extensions
+roc-plugin-repo
+
 ### lint
 __Runs lint__
 
@@ -220,16 +252,17 @@ roc repo lint [projects]
 
 #### Arguments
 
-| Name           | Description                               | Default | Type            | Required | Can be empty |
-| -------------- | ----------------------------------------- | ------- | --------------- | -------- | ------------ |
-| projects       | Projects to use                           |         | `Array(String)` | No       | Yes          |
+| Name           | Description                               | Default | Type                | Required | Can be empty |
+| -------------- | ----------------------------------------- | ------- | ------------------- | -------- | ------------ |
+| projects       | Projects to use                           |         | `Array(String)`     | No       | Yes          |
 
 #### Command options
 
-| Name           | Description                               | Default | Type            | Required | Can be empty |
-| -------------- | ----------------------------------------- | ------- | --------------- | -------- | ------------ |
-| --fix          | Use ESLint --fix option                   |         | `Boolean`       | No       |              |
-| --forceDefault | Force use of default ESLint configuration | `false` | `Boolean`       | No       |              |
+| Name           | Description                               | Default | Type                | Required | Can be empty |
+| -------------- | ----------------------------------------- | ------- | ------------------- | -------- | ------------ |
+| --concurrent   | Run concurrently                          | `false` | `Boolean / Integer` | No       |              |
+| --fix          | Use ESLint --fix option                   |         | `Boolean`           | No       |              |
+| --forceDefault | Force use of default ESLint configuration | `false` | `Boolean`           | No       |              |
 
 ####  Settings options
 _All groups are available._
@@ -381,12 +414,15 @@ roc repo test [projects]
 
 | Name                           | Description                                                                                                                                                                                                                                                  | Default | Type              | Required | Can be empty |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- | ----------------- | -------- | ------------ |
+| --all                          | The opposite of `onlyChanged`. If `onlyChanged` is set by default, running jest with `--all` will force Jest to run all tests instead of running only tests related to changed files.                                                                        |         |                   | No       |              |
 | --automock                     | Automock all files by default.                                                                                                                                                                                                                               |         | `Boolean`         | No       |              |
 | --bail                         | Exit the test suite immediately upon the first failing test.                                                                                                                                                                                                 |         | `Boolean`         | No       |              |
 | --browser                      | Respect the "browser" field in package.json when resolving modules. Some packages export different versions based on whether they are operating in node.js or a browser.                                                                                     |         | `Boolean`         | No       |              |
 | --cache                        | Whether to use the transform cache. Disable the cache using --no-cache.                                                                                                                                                                                      |         | `Boolean`         | No       |              |
 | --cacheDirectory               | The directory where Jest should store its cached  dependency information.                                                                                                                                                                                    |         | `String`          | No       | Yes          |
+| --changedFilesWithAncestor     | Runs tests related to the current changes and the changes made in the last commit. Behaves similarly to `--onlyChanged`.                                                                                                                                     |         | `Boolean`         | No       |              |
 | --ci                           | Whether to run Jest in continuous integration (CI) mode. This option is on by default in most popular CI environments. It will  prevent snapshots from being written unless explicitly requested.                                                            | `false` | `Boolean`         | No       |              |
+| --clearCache                   | Clears the configured Jest cache directory and then exits. Default directory can be found by calling jest --showConfig                                                                                                                                       |         | `Boolean`         | No       |              |
 | --clearMocks                   | Automatically clear mock calls and instances between every test. Equivalent to calling jest.clearAllMocks() between each test.                                                                                                                               |         | `Boolean`         | No       |              |
 | --collectCoverage              | Alias for --coverage.                                                                                                                                                                                                                                        |         | `Boolean`         | No       |              |
 | --collectCoverageFrom          | relative to <rootDir> glob pattern matching the files that coverage info needs to be collected from.                                                                                                                                                         |         | `String`          | No       | Yes          |
@@ -400,14 +436,17 @@ roc repo test [projects]
 | --coverageReporters            | A list of reporter names that Jest uses when writing coverage reports. Any istanbul reporter can be used.                                                                                                                                                    |         | `Array(Filepath)` | No       | Yes          |
 | --coverageThreshold            | A JSON string with which will be used to configure minimum threshold enforcement for coverage results                                                                                                                                                        |         | `String`          | No       | Yes          |
 | --debug                        | Print debugging info about your jest config.                                                                                                                                                                                                                 |         | `Boolean`         | No       |              |
+| --detectLeaks                  | **EXPERIMENTAL**: Detect memory leaks in tests. After executing a test, it will try to garbage collect the global object used, and fail if it was leaked                                                                                                     | `false` | `Boolean`         | No       |              |
 | --env                          | The test environment used for all tests. This can point to any file or node module. Examples: `jsdom`, `node` or `path/to/my-environment.js`                                                                                                                 |         | `String`          | No       | Yes          |
 | -e, --expand                   | Use this flag to show full diffs instead of a patch.                                                                                                                                                                                                         |         | `Boolean`         | No       |              |
 | --findRelatedTests             | Find related tests for a list of source files that were passed in as arguments. Useful for pre-commit hook integration to run the minimal amount of tests necessary.                                                                                         |         | `Boolean`         | No       |              |
 | --forceExit                    | Force Jest to exit after all tests have completed running. This is useful when resources set up by test code cannot be adequately cleaned up.                                                                                                                |         | `Boolean`         | No       |              |
+| --globalSetup                  | The path to a module that runs before All Tests.                                                                                                                                                                                                             |         | `String`          | No       | Yes          |
+| --globalTeardown               | The path to a module that runs after All Tests.                                                                                                                                                                                                              |         | `String`          | No       | Yes          |
 | --globals                      | A JSON string with map of global variables that need to be available in all test environments.                                                                                                                                                               |         | `String`          | No       | Yes          |
-| --haste                        | A JSON string with map of variables for the haste  module system                                                                                                                                                                                             |         | `String`          | No       | Yes          |
+| --haste                        | A JSON string with map of variables for the haste module system                                                                                                                                                                                              |         | `String`          | No       | Yes          |
 | --json                         | Prints the test results in JSON. This mode will send all other test output and user messages to stderr.                                                                                                                                                      |         | `Boolean`         | No       |              |
-| --lastCommit                   | Will run all tests affected by file changes in the last commit made.                                                                                                                                                                                         |         | `Boolean`         | No       |              |
+| --lastCommit                   | Run all tests affected by file changes in the last commit made. Behaves similarly to `--onlyChanged`.                                                                                                                                                        |         | `Boolean`         | No       |              |
 | --listTests                    | Lists all tests Jest will run given the arguments and exits. Most useful in a CI system together with `--findRelatedTests` to determine the tests Jest will run based on specific files                                                                      | `false` | `Boolean`         | No       |              |
 | --logHeapUsage                 | Logs the heap usage after every test. Useful to debug memory leaks. Use together with `--runInBand` and `--expose-gc` in node.                                                                                                                               |         | `Boolean`         | No       |              |
 | --mapCoverage                  | Maps code coverage reports against original source code when transformers supply source maps.                                                                                                                                                                |         | `Boolean`         | No       |              |
@@ -419,8 +458,10 @@ roc repo test [projects]
 | --modulePaths                  | An alternative API to setting the NODE_PATH env variable, modulePaths is an array of absolute paths to additional locations to search when resolving modules.                                                                                                |         | `Array(Filepath)` | No       | Yes          |
 | --noStackTrace                 | Disables stack trace in test results output                                                                                                                                                                                                                  |         | `Boolean`         | No       |              |
 | --notify                       | Activates notifications for test results.                                                                                                                                                                                                                    |         | `Boolean`         | No       |              |
-| -o, --onlyChanged              | Attempts to identify which tests to run based on which files have changed in the current repository. Only works if you're running tests in a git repository at the moment.                                                                                   |         | `Boolean`         | No       |              |
+| -o, --onlyChanged              | Attempts to identify which tests to run based on which files have changed in the current repository. Only works if you're running tests in a git or hg repository at the moment.                                                                             |         | `Boolean`         | No       |              |
+| -f, --onlyFailures             | Run tests that failed in the previous execution.                                                                                                                                                                                                             |         | `Boolean`         | No       |              |
 | --outputFile                   | Write test results to a file when the --json option is also specified.                                                                                                                                                                                       |         | `String`          | No       | Yes          |
+| --passWithNoTests              | Will not fail if no tests are found (for example while using `--testPathPattern`.)                                                                                                                                                                           | `false` | `Boolean`         | No       |              |
 | --preset                       | A preset that is used as a base for Jest's configuration.                                                                                                                                                                                                    |         | `String`          | No       | Yes          |
 | --projects                     | A list of projects that use Jest to run all tests of all projects in a single instance of Jest.                                                                                                                                                              |         | `Array(Filepath)` | No       | Yes          |
 | --reporters                    | A list of custom reporters for the test suite.                                                                                                                                                                                                               |         | `Array(Filepath)` | No       | Yes          |
@@ -430,16 +471,19 @@ roc repo test [projects]
 | --rootDir                      | The root directory that Jest should scan for tests and modules within.                                                                                                                                                                                       |         | `String`          | No       | Yes          |
 | --roots                        | A list of paths to directories that Jest should use to search for files in.                                                                                                                                                                                  |         | `Array(Filepath)` | No       | Yes          |
 | -i, --runInBand                | Run all tests serially in the current process (rather than creating a worker pool of child processes that run tests). This is sometimes useful for debugging, but such use cases are pretty rare.                                                            |         | `Boolean`         | No       |              |
+| --runTestsByPath               | Used when provided patterns are exact file paths. This avoids converting them into a regular expression and matching it against every single file.                                                                                                           | `false` | `Boolean`         | No       |              |
 | --setupFiles                   | The paths to modules that run some code to configure or set up the testing environment before each test.                                                                                                                                                     |         | `Array(Filepath)` | No       | Yes          |
 | --setupTestFrameworkScriptFile | The path to a module that runs some code to configure or set up the testing framework before each test.                                                                                                                                                      |         | `String`          | No       | Yes          |
 | --showConfig                   | Print your jest config and then exits.                                                                                                                                                                                                                       |         | `Boolean`         | No       |              |
 | --silent                       | Prevent tests from printing messages through the console.                                                                                                                                                                                                    |         | `Boolean`         | No       |              |
 | --snapshotSerializers          | A list of paths to snapshot serializer modules Jest should use for snapshot testing.                                                                                                                                                                         |         | `Array(Filepath)` | No       | Yes          |
 | --testEnvironment              | Alias for --env                                                                                                                                                                                                                                              |         | `String`          | No       | Yes          |
+| --testFailureExitCode          | Exit code of `jest` command if the test run failed                                                                                                                                                                                                           |         | `String`          | No       | Yes          |
+| --testLocationInResults        | Add `location` information to the test results                                                                                                                                                                                                               | `false` | `Boolean`         | No       |              |
 | --testMatch                    | The glob patterns Jest uses to detect test files.                                                                                                                                                                                                            |         | `Array(Filepath)` | No       | Yes          |
 | -t, --testNamePattern          | Run only tests with a name that matches the regex pattern.                                                                                                                                                                                                   |         | `String`          | No       | Yes          |
 | --testPathIgnorePatterns       | An array of regexp pattern strings that are matched against all test paths before executing the test. If the test path matches any of the patterns, it will be skipped.                                                                                      |         | `Array(Filepath)` | No       | Yes          |
-| --testPathPattern              | A regexp pattern string that is matched against all tests paths before executing the test.                                                                                                                                                                   |         | `String`          | No       | Yes          |
+| --testPathPattern              | A regexp pattern string that is matched against all tests paths before executing the test.                                                                                                                                                                   |         | `Array(Filepath)` | No       | Yes          |
 | --testRegex                    | The regexp pattern Jest uses to detect test files.                                                                                                                                                                                                           |         | `String`          | No       | Yes          |
 | --testResultsProcessor         | Allows the use of a custom results processor. This processor must be a node module that exports a function expecting as the first argument the result object                                                                                                 |         | `String`          | No       | Yes          |
 | --testRunner                   | Allows to specify a custom test runner. The default is  `jasmine2`. A path to a custom test runner can be provided: `<rootDir>/path/to/testRunner.js`.                                                                                                       |         | `String`          | No       | Yes          |
@@ -454,6 +498,7 @@ roc repo test [projects]
 | --version                      | Print the version and exit                                                                                                                                                                                                                                   |         | `Boolean`         | No       |              |
 | --watch                        | Watch files for changes and rerun tests related to changed files. If you want to re-run all tests when a file has changed, use the `--watchAll` option.                                                                                                      |         | `Boolean`         | No       |              |
 | --watchAll                     | Watch files for changes and rerun all tests. If you want to re-run only the tests related to the changed files, use the `--watch` option.                                                                                                                    |         | `Boolean`         | No       |              |
+| --watchPathIgnorePatterns      | An array of regexp pattern strings that are matched against all paths before trigger test re-run in watch mode. If the test path matches any of the patterns, it will be skipped.                                                                            |         | `Array(Filepath)` | No       | Yes          |
 | --watchman                     | Whether to use watchman for file crawling. Disable using --no-watchman.                                                                                                                                                                                      |         | `Boolean`         | No       |              |
 
 ####  Settings options
@@ -463,18 +508,24 @@ _All groups are available._
 ####  Defined by extensions
 roc-plugin-repo
 
-### unlink
-__Unlinks the projects__
+### watch
+__Build projects in watch mode__
 
 ```
-roc repo unlink [projects]
+roc repo watch [projects]
 ```
 
 #### Arguments
 
-| Name     | Description     | Default | Type            | Required | Can be empty |
-| -------- | --------------- | ------- | --------------- | -------- | ------------ |
-| projects | Projects to use |         | `Array(String)` | No       | Yes          |
+| Name         | Description      | Default | Type                | Required | Can be empty |
+| ------------ | ---------------- | ------- | ------------------- | -------- | ------------ |
+| projects     | Projects to use  |         | `Array(String)`     | No       | Yes          |
+
+#### Command options
+
+| Name         | Description      | Default | Type                | Required | Can be empty |
+| ------------ | ---------------- | ------- | ------------------- | -------- | ------------ |
+| --concurrent | Run concurrently | `2`     | `Boolean / Integer` | No       |              |
 
 ####  Settings options
 _All groups are available._

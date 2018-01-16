@@ -6,6 +6,7 @@
 * [roc-plugin-repo](#roc-plugin-repo)
   * [babel-config](#babel-config-1)
   * [get-projects](#get-projects)
+  * [run-script](#run-script)
 
 ## roc-plugin-babel
 
@@ -31,4 +32,10 @@ __Have post:__ No
 
 __Connects to extension:__ Not specified  
 __Connects to hook:__ `get-projects`  
+__Have post:__ No  
+
+### run-script
+
+__Connects to extension:__ Not specified  
+__Connects to hook:__ `run-script`  
 __Have post:__ No  

@@ -8,6 +8,7 @@
   * [get-projects](#get-projects)
   * [release-after-build](#release-after-build)
   * [release-preconditions](#release-preconditions)
+  * [run-script](#run-script)
 
 ## roc
 
@@ -75,3 +76,18 @@ __Expected return value:__ _Nothing_
 | --------- | ------------------------------ | --------------- | -------- | ------------ |
 | toRelease | Projects that will be released | `Array(String)` | No       | Yes          |
 | Listr     | Listr instance                 |                 | No       |              |
+
+### run-script
+
+Invoked for build, clean, lint, release and test making it possible to customize what is done and extend existing functionality, the functions can return a promise.
+
+__Initial value:__ _Nothing_  
+__Expected return value:__ `Function / Array(Function)`
+
+#### Arguments
+
+| Name     | Description                                                                                                                                                                  | Type              | Required | Can be empty |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | -------- | ------------ |
+| script   | The script that has been invoked, can be either `build`, `clean`, `lint`, `release` or `test`.                                                                               | `String`          | No       | Yes          |
+| projects | The projects that the script has been invoked for.                                                                                                                           | `Array(Object())` | No       | Yes          |
+| extra    | Additional arguments containing `options`, `extraArguments` from the command as well as `createLogger` that takes a name and returns a function that can be used for logging | `Object()`        | No       | Yes          |
