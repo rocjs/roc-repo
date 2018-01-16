@@ -15,16 +15,14 @@ export default async function updateChangelogs(
   isMonorepo,
   from,
   prerelease,
+  settings,
 ) {
-  const latest = await getLatestCommitsSinceRelease(
-    'angular',
-    from,
-    projects,
-    isMonorepo,
-  );
+  const latest = await getLatestCommitsSinceRelease(from, projects, isMonorepo);
   const generateChangelogForProject = createGenerateChangelogForProject(
     isMonorepo,
     projects,
+    settings.release.changelogTypes,
+    settings.release.includeBody,
   );
 
   const fromRelease = project =>
@@ -39,26 +37,25 @@ export default async function updateChangelogs(
   );
 }
 
-function createGenerateChangelogForProject(isMonorepo, projects) {
+function createGenerateChangelogForProject(
+  isMonorepo,
+  projects,
+  changelogTypes,
+  includeBody,
+) {
   return (project, from) =>
     new Promise(resolve => {
       const changelog = path.join(project.path, 'CHANGELOG.md');
       const tmp = tempfile();
       return readStream(changelog).then(changelogReadStream => {
         conventionalChangelog(
-          conventionalChangelogOptions('angular', isMonorepo, projects)(
-            project,
-          ),
+          conventionalChangelogOptions(isMonorepo, projects, {
+            type: 'markdown',
+            changelogTypes,
+            includeBody,
+          })(project),
           {},
           { from, reverse: true },
-          {
-            noteKeywords: [
-              'SCOPE',
-              'SCOPES',
-              'BREAKING CHANGE',
-              'BREAKING CHANGES',
-            ],
-          },
         )
           .pipe(addStream(changelogReadStream))
           .pipe(fs.createWriteStream(tmp))

@@ -337,6 +337,7 @@ export default projects => ({
                     !!settings.mono,
                     from,
                     prereleaseTag,
+                    settings,
                   ),
               },
               {
@@ -354,6 +355,7 @@ export default projects => ({
                           individual,
                           from,
                           prereleaseTag,
+                          settings,
                         );
 
                         if (!token) {
@@ -373,6 +375,7 @@ export default projects => ({
                     individual,
                     from,
                     prereleaseTag,
+                    settings,
                   );
 
                   return Promise.resolve();

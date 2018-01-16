@@ -4,6 +4,8 @@ import semver from 'semver';
 import { upperCase, sortBy } from 'lodash';
 import { executeSync } from 'roc';
 
+import conventionalChangelogRoc from './conventional-changelog-roc';
+
 export const versions = {
   NOTHING: 0,
   PATCH: 1,
@@ -42,12 +44,7 @@ export function incrementToValue(increment) {
   return versions.NOTHING;
 }
 
-export function getLatestCommitsSinceRelease(
-  preset,
-  from,
-  projects,
-  isMonorepo,
-) {
+export function getLatestCommitsSinceRelease(from, projects, isMonorepo) {
   return new Promise(resolve => {
     const latest = projects.reduce(
       (previous, project) => ({
@@ -61,7 +58,7 @@ export function getLatestCommitsSinceRelease(
     );
     conventionalChangelog(
       {
-        preset,
+        config: conventionalChangelogRoc(),
         append: true,
         transform(commit, cb) {
           if (commit.type === 'release') {
@@ -91,9 +88,9 @@ export function getLatestCommitsSinceRelease(
   });
 }
 
-export function conventionalChangelogOptions(preset, isMonorepo, projects) {
+export function conventionalChangelogOptions(isMonorepo, projects, options) {
   return project => ({
-    preset,
+    config: conventionalChangelogRoc(options),
     append: true,
     pkg: {
       path: path.join(project.path, 'package.json'),

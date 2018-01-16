@@ -22,6 +22,8 @@ export const config = {
       babelPresetEnv: {},
       runGitHooks: false,
       release: {
+        changelogTypes: ['fix', 'perf', 'revert', 'feat'],
+        includeBody: false,
         collectedRelease: '[name:2:a].[hash:6].[date:yyyy-mm-dd]',
       },
     },
@@ -68,6 +70,25 @@ export const meta = {
         validator: isBoolean,
       },
       release: {
+        changelogTypes: {
+          description:
+            'Commit message types that always should create an entry in changelogs or true to create for all',
+          validator: oneOf((input, info) => {
+            if (info) {
+              return createInfoObject({
+                validator: 'true',
+                converter: () => toBoolean,
+              });
+            }
+
+            return input === true;
+          }, isArray(/^(feat|fix|perf|revert|docs|style|refactor|test|chore)$/)),
+        },
+        includeBody: {
+          description:
+            'If the body of the commit message should be part of the changelog',
+          validator: isBoolean,
+        },
         collectedRelease: {
           description: `Should be a template string if collected releases should be performed for monorepos or false if not.`,
           validator: oneOf((input, info) => {
