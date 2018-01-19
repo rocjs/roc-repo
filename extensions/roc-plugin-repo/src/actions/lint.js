@@ -1,17 +1,31 @@
 import path from 'path';
+import fs from 'fs-extra';
 
 import execa from 'execa';
 import { fileExists } from 'roc';
 import log from 'roc/log/default/small';
+import xml2js from 'xml2js';
+import pify from 'pify';
 
 const eslint = require.resolve('eslint/bin/eslint');
 
-const eslintCommand = (project, fix, config, ignorePattern, ignoreFile) =>
+const eslintCommand = (
+  project,
+  fix,
+  config,
+  ignorePattern,
+  ignoreFile,
+  checkstyle,
+) =>
   `${eslint} ${config}${project.path} --ignore-path '${ignoreFile}' --ignore-pattern '${ignorePattern}' ${fix
     ? '--fix'
-    : ''}`;
+    : ''} ${checkstyle ? `-f checkstyle` : ''}`;
 
-export default (context, projects, { options: { fix, forceDefault } }) => {
+export default (
+  context,
+  projects,
+  { options: { fix, forceDefault, checkstyle } },
+) => {
   let config;
   if (fileExists('.eslintrc', context.directory) && !forceDefault) {
     log.info(
@@ -44,18 +58,89 @@ export default (context, projects, { options: { fix, forceDefault } }) => {
             '*',
           );
 
-          return execa.shell(
-            eslintCommand(project, fix, config, ignorePattern, ignoreFile),
-            { stdio: 'inherit' },
-          );
+          return {
+            projectPath: project.path,
+            newRoot: path.join(project.directory, project.folder),
+            promise: execa.shell(
+              eslintCommand(
+                project,
+                fix,
+                config,
+                ignorePattern,
+                ignoreFile,
+                !!checkstyle,
+              ),
+              { stdio: checkstyle ? undefined : 'inherit' },
+            ),
+          };
         })
-        .map(promise => promise.then(() => 0, () => 1)),
-    ).then(results => {
-      const status = results.reduce((previous, current) =>
-        Math.max(previous, current),
+        .map(({ promise, projectPath, newRoot }) =>
+          promise.then(
+            results => ({
+              xmlData: results.stdout,
+              projectPath,
+              newRoot,
+              code: 0,
+            }),
+            results => ({
+              xmlData: results.stdout,
+              projectPath,
+              newRoot,
+              code: 1,
+            }),
+          ),
+        ),
+    ).then(async results => {
+      const status = results.reduce(
+        (previous, { code }) => Math.max(previous, code),
+        0,
       );
-      if (status === 1) {
+
+      // Only care if it failed when not runing with --checkstyle
+      if (!checkstyle && status === 1) {
         process.exitCode = 1;
       }
+
+      // Clean paths and merge files if monorepo
+      if (checkstyle) {
+        let newXML = {
+          checkstyle: {
+            file: [],
+          },
+        };
+        const parser = new xml2js.Parser();
+        const parseString = pify(parser.parseString);
+        await Promise.all(
+          results.map(async ({ xmlData, projectPath, newRoot }) => {
+            const checkstyleXML = await parseString(xmlData);
+            // Clean files
+            newXML = {
+              ...newXML,
+              ...checkstyleXML,
+              checkstyle: {
+                ...checkstyleXML.checkstyle,
+                file: [
+                  ...newXML.checkstyle.file,
+                  ...checkstyleXML.checkstyle.file.map(f => ({
+                    ...f,
+                    $: {
+                      name: f.$.name.replace(projectPath, newRoot),
+                    },
+                  })),
+                ],
+              },
+            };
+          }),
+        );
+
+        const builder = new xml2js.Builder();
+        await fs.ensureDir(path.join(context.directory, 'reports'));
+        return fs.writeFile(
+          path.join(context.directory, 'reports', 'lint.xml'),
+          builder.buildObject(newXML),
+        );
+      }
+
+      return Promise.resolve();
     });
 };

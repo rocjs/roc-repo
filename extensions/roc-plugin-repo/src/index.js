@@ -408,6 +408,10 @@ module.exports.roc = {
             description: 'Force use of default ESLint configuration',
             default: false,
           },
+          checkstyle: {
+            validator: validators.isBoolean,
+            description: 'Generate a Checkstyle XML report in /reports',
+          },
         },
       },
       list: {
