@@ -60,7 +60,9 @@ export default (
 
           return {
             projectPath: project.path,
-            newRoot: path.join(project.directory, project.folder),
+            newRoot: project.directory
+              ? `/${path.join(project.directory, project.folder)}`
+              : '',
             promise: execa.shell(
               eslintCommand(
                 project,
