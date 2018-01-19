@@ -1,3 +1,11 @@
+<a name="0.1.1"></a>
+## 0.1.1 (2018-01-19)
+
+### Bug Fixes
+
+* Fix issue with lint command for normal repos ([d92d46d](https://github.com/rocjs/roc-repo/commit/d92d46d))
+
+
 <a name="0.1.0"></a>
 # 0.1.0 (2018-01-19)
 
