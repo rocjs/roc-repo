@@ -1,3 +1,12 @@
+<a name="0.1.2"></a>
+## 0.1.2 (2018-01-19)
+
+### Bug Fixes
+
+* Don't normalize paths since that can create issues ([00f5465](https://github.com/rocjs/roc-repo/commit/00f5465))  
+  * Some integrations needs the full path to work correctly given their assumptions of the name.
+
+
 <a name="0.1.1"></a>
 ## 0.1.1 (2018-01-19)
 
