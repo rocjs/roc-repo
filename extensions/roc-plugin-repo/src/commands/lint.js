@@ -3,6 +3,7 @@ import scriptRunner from './utils/scriptRunner';
 export default projects => ({
   arguments: { managed: { projects: selectedProjects } },
   options: { managed: { concurrent, fix, forceDefault, checkstyle } },
+  extraArguments,
   context,
 }) => {
   const settings = context.config.settings.repo;
@@ -10,9 +11,15 @@ export default projects => ({
     ({ name }) => !selectedProjects || selectedProjects.includes(name),
   );
 
-  return scriptRunner('lint')(selected, settings, concurrent, {
-    fix,
-    forceDefault,
-    checkstyle,
-  });
+  return scriptRunner('lint')(
+    selected,
+    settings,
+    concurrent,
+    {
+      fix,
+      forceDefault,
+      checkstyle,
+    },
+    extraArguments,
+  );
 };

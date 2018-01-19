@@ -58,36 +58,26 @@ export default (
             '*',
           );
 
-          return {
-            projectPath: project.path,
-            newRoot: project.directory
-              ? `/${path.join(project.directory, project.folder)}`
-              : '',
-            promise: execa.shell(
-              eslintCommand(
-                project,
-                fix,
-                config,
-                ignorePattern,
-                ignoreFile,
-                !!checkstyle,
-              ),
-              { stdio: checkstyle ? undefined : 'inherit' },
+          return execa.shell(
+            eslintCommand(
+              project,
+              fix,
+              config,
+              ignorePattern,
+              ignoreFile,
+              !!checkstyle,
             ),
-          };
+            { stdio: checkstyle ? undefined : 'inherit' },
+          );
         })
-        .map(({ promise, projectPath, newRoot }) =>
+        .map(promise =>
           promise.then(
             results => ({
               xmlData: results.stdout,
-              projectPath,
-              newRoot,
               code: 0,
             }),
             results => ({
               xmlData: results.stdout,
-              projectPath,
-              newRoot,
               code: 1,
             }),
           ),
@@ -113,9 +103,9 @@ export default (
         const parser = new xml2js.Parser();
         const parseString = pify(parser.parseString);
         await Promise.all(
-          results.map(async ({ xmlData, projectPath, newRoot }) => {
+          results.map(async ({ xmlData }) => {
             const checkstyleXML = await parseString(xmlData);
-            // Clean files
+            // Merge
             newXML = {
               ...newXML,
               ...checkstyleXML,
@@ -123,12 +113,7 @@ export default (
                 ...checkstyleXML.checkstyle,
                 file: [
                   ...newXML.checkstyle.file,
-                  ...checkstyleXML.checkstyle.file.map(f => ({
-                    ...f,
-                    $: {
-                      name: f.$.name.replace(projectPath, newRoot),
-                    },
-                  })),
+                  ...checkstyleXML.checkstyle.file,
                 ],
               },
             };
