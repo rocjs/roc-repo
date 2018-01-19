@@ -13,7 +13,7 @@ export default (context, projects, { options, extraArguments }) => {
 
   process.env.ROC_INITAL_ARGV = JSON.stringify(process.argv);
 
-  const jestConfig = {
+  let jestConfig = {
     resolver: require.resolve('../commands/utils/jest/roc-resolver.js'),
     testPathIgnorePatterns: projects.map(
       ({ path }) =>
@@ -33,14 +33,19 @@ export default (context, projects, { options, extraArguments }) => {
 
   // Parse extra arguments in the same way as Jest does
   const jestArgv = yargs(extraArguments).options(jestCli.options).argv;
-  const jestOptions = {
-    ...options,
-    ...jestArgv,
-  };
 
-  Object.keys(jestOptions).forEach(
-    key => jestOptions[key] === undefined && delete jestOptions[key],
+  // Remove empty keys
+  Object.keys(jestArgv).forEach(
+    key => jestArgv[key] === undefined && delete jestArgv[key],
   );
+  Object.keys(options).forEach(
+    key => options[key] === undefined && delete options[key], // eslint-disable-line no-param-reassign
+  );
+
+  const jestOptions = {
+    ...jestArgv,
+    ...options,
+  };
 
   // Verify the options
   jestCli.check(jestOptions);
