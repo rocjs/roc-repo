@@ -1,6 +1,9 @@
+import { join } from 'path';
 import resolveFrom from 'resolve-from';
 import jest from 'jest'; // eslint-disable-line import/no-extraneous-dependencies
 import yargs from 'yargs';
+import { merge, fileExists } from 'roc';
+import log from 'roc/log/default/small';
 
 const jestCli = require(resolveFrom(
   require.resolve('jest'),
@@ -30,6 +33,36 @@ export default (context, projects, { options, extraArguments }) => {
       ),
     ),
   };
+
+  /**
+  Merge Jest config
+
+  TODO: To be moved into a standalone module for better reuse
+
+  The priority when Roc loads Jest configuration.
+  1. "jest" inside roc.config.js
+  2. jest.config.js TODO: Manage --config path/to/js|json
+  3. "jest" inside package.json
+  */
+  if (context.config.jest) {
+    if (fileExists('jest.config.js', context.directory)) {
+      log.warn(
+        'You have defined a Jest configuration in the roc.config.js file that will be used over the existing jest.config.js file.',
+      );
+    } else if (context.packageJSON.jest) {
+      log.warn(
+        'You have defined a Jest configuration in the roc.config.js file that will be used over the configuration inside package.json.',
+      );
+    }
+    jestConfig = merge(jestConfig, context.config.jest);
+  } else if (fileExists('jest.config.js', context.directory)) {
+    jestConfig = merge(
+      jestConfig,
+      require(join(context.directory, 'jest.config.js')),
+    );
+  } else if (context.packageJSON.jest) {
+    jestConfig = merge(jestConfig, context.packageJSON.jest);
+  }
 
   // Parse extra arguments in the same way as Jest does
   const jestArgv = yargs(extraArguments).options(jestCli.options).argv;

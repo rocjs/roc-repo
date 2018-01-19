@@ -28,6 +28,7 @@ export const config = {
       },
     },
   },
+  jest: undefined,
 };
 
 export const meta = {
@@ -104,5 +105,8 @@ export const meta = {
         },
       },
     },
+  },
+  jest: {
+    description: 'Jest configuration',
   },
 };
