@@ -252,17 +252,18 @@ roc repo lint [projects]
 
 #### Arguments
 
-| Name           | Description                               | Default | Type                | Required | Can be empty |
-| -------------- | ----------------------------------------- | ------- | ------------------- | -------- | ------------ |
-| projects       | Projects to use                           |         | `Array(String)`     | No       | Yes          |
+| Name           | Description                                  | Default | Type                | Required | Can be empty |
+| -------------- | -------------------------------------------- | ------- | ------------------- | -------- | ------------ |
+| projects       | Projects to use                              |         | `Array(String)`     | No       | Yes          |
 
 #### Command options
 
-| Name           | Description                               | Default | Type                | Required | Can be empty |
-| -------------- | ----------------------------------------- | ------- | ------------------- | -------- | ------------ |
-| --concurrent   | Run concurrently                          | `false` | `Boolean / Integer` | No       |              |
-| --fix          | Use ESLint --fix option                   |         | `Boolean`           | No       |              |
-| --forceDefault | Force use of default ESLint configuration | `false` | `Boolean`           | No       |              |
+| Name           | Description                                  | Default | Type                | Required | Can be empty |
+| -------------- | -------------------------------------------- | ------- | ------------------- | -------- | ------------ |
+| --checkstyle   | Generate a Checkstyle XML report in /reports |         | `Boolean`           | No       |              |
+| --concurrent   | Run concurrently                             | `false` | `Boolean / Integer` | No       |              |
+| --fix          | Use ESLint --fix option                      |         | `Boolean`           | No       |              |
+| --forceDefault | Force use of default ESLint configuration    | `false` | `Boolean`           | No       |              |
 
 ####  Settings options
 _All groups are available._
@@ -468,6 +469,7 @@ roc repo test [projects]
 | --resetMocks                   | Automatically reset mock state between every test. Equivalent to calling jest.resetAllMocks() between each test.                                                                                                                                             |         | `Boolean`         | No       |              |
 | --resetModules                 | If enabled, the module registry for every test file will be reset before running each individual test.                                                                                                                                                       |         | `Boolean`         | No       |              |
 | --resolver                     | A JSON string which allows the use of a custom resolver.                                                                                                                                                                                                     |         | `String`          | No       | Yes          |
+| --restoreMocks                 | Automatically restore mock state and implementation between every test. Equivalent to calling jest.restoreAllMocks() between each test.                                                                                                                      |         | `Boolean`         | No       |              |
 | --rootDir                      | The root directory that Jest should scan for tests and modules within.                                                                                                                                                                                       |         | `String`          | No       | Yes          |
 | --roots                        | A list of paths to directories that Jest should use to search for files in.                                                                                                                                                                                  |         | `Array(Filepath)` | No       | Yes          |
 | -i, --runInBand                | Run all tests serially in the current process (rather than creating a worker pool of child processes that run tests). This is sometimes useful for debugging, but such use cases are pretty rare.                                                            |         | `Boolean`         | No       |              |

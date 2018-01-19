@@ -1,3 +1,46 @@
+<a name="0.1.0"></a>
+# 0.1.0 (2018-01-19)
+
+### Bug Fixes
+
+* Bump conventional-changelog dependencies ([cb3c7c8](https://github.com/rocjs/roc-repo/commit/cb3c7c8))  
+  * This to make sure we get the fix done in conventional-commits-filter that makes reverts work correctly.
+* Fix problem with management of Jest options ([521eff1](https://github.com/rocjs/roc-repo/commit/521eff1))
+* Improved logging from build, run and exec command ([e3c5379](https://github.com/rocjs/roc-repo/commit/e3c5379))
+* Remove legacy command not meant to be used anymore ([26ad779](https://github.com/rocjs/roc-repo/commit/26ad779))
+* Remove repo.targets since it's not used anymore ([89da3ed](https://github.com/rocjs/roc-repo/commit/89da3ed))  
+  * This is now instead dynamic based on if the project has a JavaScript file in either "main" or "module".
+* Solve a problem that could break auto scopes ([1f2a5b8](https://github.com/rocjs/roc-repo/commit/1f2a5b8))  
+  * Sometimes auto scope (AUTO/*) detection would fail given certain modified files.
+* Sort commits shown when using "roc repo status" ([ad7c826](https://github.com/rocjs/roc-repo/commit/ad7c826))
+* Use execa over execute for better errors ([69666eb](https://github.com/rocjs/roc-repo/commit/69666eb))
+* Use logger instead of console.log ([ecd47f7](https://github.com/rocjs/roc-repo/commit/ecd47f7))
+
+### Features
+
+* Add new command, "import", for importing repos ([6fcfeca](https://github.com/rocjs/roc-repo/commit/6fcfeca))
+* Added new watch command that can be used over -w ([4a61efd](https://github.com/rocjs/roc-repo/commit/4a61efd))  
+  * This is useful when implementing custom a build commands and want to be able to do the same when running watch.
+* Configure types used in changelog and optional body ([a6dacdb](https://github.com/rocjs/roc-repo/commit/a6dacdb))  
+  * This can be configured in the following way using `roc.config.js`.  
+  
+    ```js
+    release: {
+      changelogTypes: true, // true for all types, will default to ['fix', 'perf', 'revert', 'feat']
+      includeBody: true, // Will default to false
+    }
+    ```
+* Made it possible to define custom scripts ([b38469b](https://github.com/rocjs/roc-repo/commit/b38469b))  
+  * This can be done using npm scripts in the package.json for a project. Additionally it's possible to add actions that interact with how projects are built.
+* Possible to use AUTO as scope in addition to * ([d981d72](https://github.com/rocjs/roc-repo/commit/d981d72))
+* Require Jest over indirectly exporting it ([0a8bc2f](https://github.com/rocjs/roc-repo/commit/0a8bc2f))  
+  * Means that project now will need to manage the Jest version themselves which will make it easier for projects to update Jest in the future and less risk for breaking changes in roc-plugin-repo.
+* Show location of projects when using list command ([2a946e4](https://github.com/rocjs/roc-repo/commit/2a946e4))
+* Support custom Jest configuration ([fbf5184](https://github.com/rocjs/roc-repo/commit/fbf5184))  
+  * This configuration can be placed inside the roc.config.js under `jest`, in a `jest.config.js` file in the root of the repo or in the `package.json` under `jest`.
+* Support for creating Checkstyle reports in ESlint ([33d777f](https://github.com/rocjs/roc-repo/commit/33d777f))
+
+
 <a name="0.1.0-beta.0"></a>
 # 0.1.0-beta.0 (2018-01-16)
 
