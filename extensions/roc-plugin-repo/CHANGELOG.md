@@ -1,3 +1,11 @@
+<a name="0.1.3"></a>
+## 0.1.3 (2018-01-22)
+
+### Bug Fixes
+
+* Fix Jest resolver when using moduleNameMapper ([3f4fb07](https://github.com/rocjs/roc-repo/commit/3f4fb07))
+
+
 <a name="0.1.2"></a>
 ## 0.1.2 (2018-01-19)
 
