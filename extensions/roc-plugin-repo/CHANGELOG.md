@@ -1,3 +1,11 @@
+<a name="0.1.4"></a>
+## 0.1.4 (2018-01-22)
+
+### Bug Fixes
+
+* Handle that a project can be empty when linting ([4a76c90](https://github.com/rocjs/roc-repo/commit/4a76c90))
+
+
 <a name="0.1.3"></a>
 ## 0.1.3 (2018-01-22)
 
