@@ -113,7 +113,7 @@ export default (
                 ...checkstyleXML.checkstyle,
                 file: [
                   ...newXML.checkstyle.file,
-                  ...checkstyleXML.checkstyle.file,
+                  ...(checkstyleXML.checkstyle.file || []),
                 ],
               },
             };
