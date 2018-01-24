@@ -2,10 +2,12 @@ import fs from 'fs';
 import resolveFrom from 'resolve-from';
 
 // This version of Roc might not be the same version as is used in the project to launch the CLI
-require('roc').runCli({
-  invoke: false,
-  argv: JSON.parse(process.env.ROC_INITAL_ARGV),
-});
+if (!global.roc) {
+  require('roc').runCli({
+    invoke: false,
+    argv: JSON.parse(process.env.ROC_INITAL_ARGV),
+  });
+}
 
 const rocResolver = require('roc').getResolveRequest('Jest');
 
