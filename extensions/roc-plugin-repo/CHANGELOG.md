@@ -1,3 +1,12 @@
+<a name="0.1.5"></a>
+## 0.1.5 (2018-01-24)
+
+### Bug Fixes
+
+* Optimize roc test and solve a problem with Jest ([d8abebf](https://github.com/rocjs/roc-repo/commit/d8abebf))  
+  * In some instances Jest will spawn workers that use the transformer and these workers have no Roc context and because of that fails, this fixes that. This makes it possible to use collectCoverageFrom with multiple workers.
+
+
 <a name="0.1.4"></a>
 ## 0.1.4 (2018-01-22)
 
