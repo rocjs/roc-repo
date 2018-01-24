@@ -1,3 +1,11 @@
+<a name="0.1.6"></a>
+## 0.1.6 (2018-01-24)
+
+### Bug Fixes
+
+* Init runtime when running test as soon as possible ([bf82af8](https://github.com/rocjs/roc-repo/commit/bf82af8))
+
+
 <a name="0.1.5"></a>
 ## 0.1.5 (2018-01-24)
 
