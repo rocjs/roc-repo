@@ -1,3 +1,11 @@
+<a name="0.1.7"></a>
+## 0.1.7 (2018-02-05)
+
+### Bug Fixes
+
+* Solve problem when defining custom build scripts ([21fb625](https://github.com/rocjs/roc-repo/commit/21fb625))
+
+
 <a name="0.1.6"></a>
 ## 0.1.6 (2018-01-24)
 
