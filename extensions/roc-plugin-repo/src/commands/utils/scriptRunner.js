@@ -42,7 +42,7 @@ export default function scriptRunner(script) {
         packageJSON.scripts[script] &&
         // This check makes sure that we don't add the project again if we launched
         // it with the same script through npm, only for normal repositories
-        (process.env.npm_lifecycle_event !== script && !isMonorepo),
+        (process.env.npm_lifecycle_event !== script || isMonorepo),
     );
 
     // Projects without custom scripts
